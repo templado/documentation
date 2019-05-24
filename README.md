@@ -1,5 +1,5 @@
 # Templado Documentation
-A pragmatic approach to templating for PHP 7.x
+A pragmatic approach to templating for PHP 7.2+
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/templado/engine/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/templado/engine/?branch=master)
 [![Code Coverage](https://scrutinizer-ci.com/g/templado/engine/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/templado/engine/?branch=master)
@@ -125,7 +125,7 @@ Let's say that you have a header tag in your template.
 
 `<h1>Some Title</h1>`
 
-Templado looks for an attribute in each element specifically names "property". If it finds one, it looks for a method in 
+Templado looks for an attribute in each element specifically named "property". If it finds one, it looks for a method in 
 your View Model who's name matches the attribute's value.
 
 `<h1 property="headline">Some Title</h1>`
@@ -140,7 +140,7 @@ class ViewModel {
 }
 ```
 
-Continuing with this example, the method is returning a string, and so Templado would used the returned string as the 
+Continuing with this example, the method is returning a string, and so Templado would use the returned string as the 
 text value for the header:
 
 `<h1 property="headline">The Actual Title</h1>`
@@ -182,7 +182,7 @@ class ViewModel {
 When an Object is returned Templado will look for methods in the Object that match the names of the attributes of the 
 element in the template. 
 
-**Note that Templado looks for a method specifically called "asString" for the text value of the element.
+**Note that Templado looks for a method specifically called "asString" for the text value of the element.**
 
 Now our header will render like this:
 
@@ -232,7 +232,7 @@ There is much more.
 
 ### Dynamic Lists
 
-One special case/feature of Templado is that a View Model Object can return an array. This allows for multiples of an 
+One special case/feature of Templado is that a View Model method can return an array. This allows for multiples of an 
 element to be rendered consecutively with different data for each. The most obvious usage for this is with lists. 
 
 Let's say that you need an unordered list of items displayed. When you are creating your template, you have no idea 
@@ -397,7 +397,7 @@ Here the top level element has a property called "user". Within the scope of the
 and "emailLinks". And within the emailLinks scope we have a property called "email". So from a property point of view we 
 have 3 levels of nesting. 
 
-So our View Model will will follow this schema as follows:
+So our View Model will follow this schema as follows:
 
 ```
 class ViewModel {
@@ -484,8 +484,8 @@ class Email {
 ``` 
 
 Notice that we returned false for the class property, which removes it from the rendered output. We could have, as another 
-example, have set a flag in our Email object to signify the "current" or "preferred" email, and then output that 
-dynamically. The options become almost limitless for you as create more complex templates. The nesting and dynamic 
+example, set a flag in our Email object to signify the "current" or "preferred" email, and then output that 
+dynamically. The options become almost limitless for you as you create more complex templates. The nesting and dynamic 
 complexity is up to you and the requirements of your project.
 
 ### Special Attributes - Prefix and Resource
