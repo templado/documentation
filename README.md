@@ -580,7 +580,216 @@ class ViewModel {
 } 
 ``` 
 
-Each of the Section Models would define their own "name" method, but there is no need to add the user methods to them.
+Each of the Section Models would define their own "name" method in our example, but there is no need to add the user 
+methods to them. Templado already knows where to find it!
+
+
+### Forms
+Coming Soon!
+
+...
+
+So at this point we have pretty much covered all that you need to effectively create and manipulate basic templates. It 
+is simple to use, clean and leaves you with templates that can be displayed on their own as sample pages. 
+
+In our, final section we will cover a few slightly more abstract features - Snippets, Transformations, and Filters. 
+These options give you full control over your final output.
+
+### Snippets
+
+Some templates, depending on your project and the requirements, can get a little complex. Perhaps, in these situations 
+it would be nice to break the template down into smaller parts. Or maybe, there are sections of your template that 
+contain a lot of duplicated code. This is where Snippets come in. They allow you write smaller, more manageable pieces 
+of code, and then pull them all together on the fly.
+
+Let's start as simply as possible, and you will immediately see how the possibilities of use are almost unlimited.
+
+Say we have the following template code:
+
+```
+<?xml version="1.0" ?>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Basic Snippet</title>
+    </head>
+    <body>
+        <div id="header" />
+    </body>
+</html>
+```   
+
+Now you want to add a page title to the existing header div. So you create a simple code snippet:
+
+```
+<h1>This Is A Simple Snippet Example</h1>
+```
+
+We can use Templado Snippets to put them together like this:
+
+```
+try {
+    $page = Templado::loadHtmlFile(
+        new FileName(__DIR__ . '/html/basic.xhtml')
+    );
+
+    $snippetListCollection = new SnippetListCollection();
+
+    $sample   = new \DOMDocument();
+    $fragment = $sample->createDocumentFragment();
+    $fragment->appendXML('<h1>This Is A Simple Snippet Example</h1>);
+    
+    $snippet = new SimpleSnippet('header', $fragment);
+
+    $snippetListCollection->addSnippet($snippet);
+    
+    $page->applySnippets($snippetListCollection);
+
+    echo $page->asString();
+
+} catch (TempladoException $e) {
+    foreach($e->getErrorList() as $error) {
+        echo (string)$error;
+    }
+}
+```
+
+Let's walk through this code. First, just as with our simple examples from before, we instantiate a Templado\Engine\Html 
+object using the static "loadHtmlFile" method.
+
+Next we initialize a SnippetListCollection. The "applySnippets" method that we use further down expects this collection 
+as its only parameter. So even if we are only adding one Snippet, it is still necessary to create the collection. 
+
+Now we turn our code fragment into a DOMNode. There are obviously many different DOMNodes objects, and ways to create 
+them. In this example we use a DOMDocumentFragment. This is accomplished by creating a new PHP DOMDocument, using the 
+"createDocumentFragment" method to get the actual fragment, and then passing in our code using the "appendXML" method. 
+
+Once we have a DOMNode, we can instantiate a new SimpleSnippet, which has two construction parameters. The first parameter 
+is the target id. In our example we reference the "header" div. The second parameter is the fragment, which will be appended 
+to the element of the target id (**if it exists**). As we just pointed out, this parameter is expected to be a DOMNode.
+
+Now we simply add the Snippet to our Collection, and call the "applySnippets" method to complete the process. 
+
+The final rendered page looks like this:
+
+```
+<?xml version="1.0" ?>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Basic Snippet</title>
+    </head>
+    <body>
+        <div id="header">
+            <h1>This Is A Simple Snippet Example</h1>
+        </div>
+    </body>
+</html>
+```
+
+This is an extremely over-simplified example. In reality, if this is all that you wanted to do, it would be easier, and 
+cleaner to just write out the template code, and use property attributes. But this gives you an idea of what Snippets 
+can do.
+
+Let's go a little deeper. 
+
+We can nest our Snippets. By doing so you start to see the power behind them. If we simply add an id to our first Snippet, 
+then we can add a second Snippet the references it. So we update our original fragment:
+
+```
+...
+
+$fragment->appendXML('<h1 id="main-title">This Is A Simple Snippet Example</h1>');
+``` 
+
+And add our second Snippet:
+
+```
+... 
+
+$snippetListCollection->addSnippet(
+    new SimpleSnippet('main-title', new \DOMText(' And Then Some'))
+);
+```
+
+Notice here that, since we are just appending text to the now existing header element, we simply instantiate a DOMText 
+object with our addition text, create the SimpleSnippet, and add it to the collection. 
+
+And of course, we apply the SnippetListCollection
+
+```
+...
+
+$page->applySnippets($snippetListCollection);
+```
+
+Now our final output will look like this:
+
+```
+<?xml version="1.0" ?>
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Basic Snippet</title>
+    </head>
+    <body>
+        <div id="header">
+            <h1 id="main-title">This Is A Simple Snippet Example And Then Some</h1>
+        </div>
+    </body>
+</html>
+```
+
+This is powerful, but let's get to the real point here. Snippets are way to combine, nest and modify code blocks. But 
+notice that we are still working with the same base object - the Templado\Engine\Html object. And therefore, we can still 
+apply View Models to it. 
+
+Let's modify our example again. But this time let's create a more complex fragment:
+
+```
+... 
+
+$xhtml = <<<xhtml
+    <h1 id="main-title">This Is A Simple Snippet Example And Then Some</h1>
+    <div property="user">
+    <p>Name: <span property="name">Original Name</span></p>
+        <span>EMail:</span>
+        <ul>
+            <li property="emailLinks">
+                <a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a>
+            </li>
+        </ul>
+    </div>
+xhtml;
+
+$fragment->appendXML($xhtml);
+
+$snippet = new SimpleSnippet('header', $fragment);
+
+$snippetListCollection->addSnippet($snippet);
+
+$page->applySnippets($snippetListCollection);
+```
+ 
+Once we have added our extended Snippet to our base template, but before we render it, we can apply our View Model:
+
+```
+$page->applyViewModel(new ViewModel());
+```
+
+**If you have not read the previous documentation on View Models and the property attribute, now would be a good to do so**. 
+Otherwise, you understand that now you would get a fully rendered page.
+
+Additionally it should be pointed out that, since you can load the code fragments from a file, it would be trivial to 
+create well organized, reusable code fragment files.   
+
+And there you have it. We could keep adding more and more complex examples, but it should be clear at this point just 
+how powerful this is. You can easily create more complex blocks of code that can be assembled in any number of ways. 
+These code fragments can be reused, and new Snippets can be added to them. As stated earlier, the ways this can be applied 
+are almost endless.  
 
 ## Examples
 
