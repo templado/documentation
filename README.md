@@ -490,31 +490,50 @@ complexity is up to you and the requirements of your project.
 
 ### Special Attributes - Prefix and Resource
 
-There are two special attribute features in Templado. The first is called "prefix", and is simply a way to alias 
+There are two *special attribute features in Templado. The first is called "prefix", and is simply a way to alias 
 (or namespace) your properties. Let's say that you have a property called "user" that you want to reference multiple 
-times. You can use the "prefix" attribute in place of the "property" attribute to alias your element. Then prefix 
-properties using the colon notation:
+times. You can use the "prefix" attribute in place of the "property" attribute to accomplish this:
 
 ```
 <div prefix="u user">
     <p>Name: <span property="u:name">Original Name</span></p>
-    <div>
-        <span>EMail:</span>
-        <ul>
-            <li property="u:emailLinks">
-                <a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a>
-            </li>
-        </ul>
-    </div>
+</div>
+<div>
+    <span>EMail:</span>
+    <ul>
+        <li property="u:emailLinks">
+            <a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a>
+        </li>
+    </ul>
 </div>
 ```
 
-The second special attribute is called "resource". Let's say that you have a User element nested within another element 
-in your template.
+In our prefix attribute we used the letter "u" (*short for user, obviously*) followed by a space, and then the property 
+that we want to reference (*in this case "user"*).
+
+Now, since we have created an alias for the user property, notice that we must use the colon notation to reference its 
+methods/properties. (*"u:" followed by the method name*)
+
+But now we can reference it from anywhere else in our template. Notice that the "u:emailLinks" property is used 
+**outside** of the user element. This can be quite useful if you have the need to reference the user property several 
+times (or in several places) within your template. 
+
+  
+
+The second special attribute is called "resource". It is similar to prefix in that it is also used in place of the 
+property attribute, and it is also a way that we can reference a property's methods elsewhere in our template. The 
+important difference is that resource tells Templado to look back to our main (*top level*) View Model. This is quite 
+useful in situations where a property is nested within the scope of another property in your template. 
+ 
+Let's say that you want to display "user" information in two (*or more*) different sections in your template. And each 
+of these instances of user in nested within the scope of another property. Rather than duplicating the user methods 
+within each of the parent Property Models, your can define the user method within the top level View Model, and then use 
+the resource attribute to reference it there.
 
 ```
-<div property="accountDetails">
-    <div property="user">
+<div property="sectionOne">
+    <h2 property="sectionTitle">Section Title</h2>
+    <div resource="user">
         <p>Name: <span property="name">Original Name</span></p>
         <div>
             <span>EMail:</span>
@@ -526,16 +545,8 @@ in your template.
         </div>
     </div>
 </div>
-```
-
-But perhaps you also want to display the User element within another section of the page. In this case, rather than 
-duplicating the method code in each section, you can use the "resource" attribute. This attribute works in 
-the same way as the "property" attribute with one important difference. In stead of looking within the current scope, 
-Templado goes back to your top level View Model to find the method. So we change the above template code, and replace 
-the "property" attribute for the User element to be "resource".
-
-```
-<div property="accountDetails">
+<div property="sectionTwo">
+    <h2 property="sectionTitle">Section Title</h2>
     <div resource="user">
         <p>Name: <span property="name">Original Name</span></p>
         <div>
@@ -550,9 +561,26 @@ the "property" attribute for the User element to be "resource".
 </div>
 ```
 
-And now Templado will look for the user method in ViewModel, rather than AccountDetails. 
+In this case user is nested with the scope of the sections (one and two), but because we used resource instead of 
+property, Templado will look to our original View Model, rather than the Section Models. 
 
+```
+class ViewModel {
+    public function sectionOne() {
+        return new SectionOne();
+    }
+    
+    public function sectionTwo() {
+        return new SectionTwo;
+    }
+    
+    public function user() {
+        return new User();
+    }   
+} 
+``` 
 
+Each of the Section Models would define their own "name" method, but there is no need to add the user methods to them.
 
 ## Examples
 
