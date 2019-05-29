@@ -791,6 +791,80 @@ how powerful this is. You can easily create more complex blocks of code that can
 These code fragments can be reused, and new Snippets can be added to them. As stated earlier, the ways this can be applied 
 are almost endless.  
 
+### Transformations and Filters
+
+Occasionally, there may be times when you have the need to manipulate the final output beyond just applying data models. 
+Perhaps there is something that needs to be completely stripped out of the document, or changed based on the environment, 
+or for temporal reasons. The question of why you would need to change something is basically beside the point. There could 
+be any number of reasons. The question is how. 
+
+Templado gives you two options for handling these situations - Transformations and Filters. Let's start with Transformations.
+
+Let's say that you have a template which, for whatever reason, you decide that you want to remove all elements with a 
+specific attribute. This example is, of course contrived, but let's say that you want to remove all of the elements that 
+have our "property" attribute. Templado gives you the option of writing and applying a Transformation.
+
+Templado\Engine\Transformation is an Interface with just two methods defined - "getSelector" and "apply". 
+
+The "getSelector" method is used to define which elements of the document you would like to affect. And the 
+"apply" method defines what you would actually like to do. 
+
+You could implement the Transformation Interface like this:
+
+```
+class PropertyRemoverTransformation implements Transformation
+{
+    public function getSelector(): Selector {
+        return new XPathSelector('//*[@property]');
+    }
+
+    public function apply(DOMNode $context) {
+        $context->parentNode->removeChild($context);
+    }
+}
+```
+
+The signatures of the methods are of course defined in the interface. The "getSelector" method must return a 
+Templado\Engine\Selector. Templado has two built in Classes that can help you with that. In this example we are using the 
+Templado\Engine\XPathSelector to define the Selector using XPath syntax. If you aren't familiar with this syntax you can 
+find a nice explanation [here](https://www.w3schools.com/xml/xpath_syntax.asp)
+
+So in our example above, we instantiate a new XPathSelector using the syntax to select all elements with that contain the 
+"property" attribute. 
+
+Internally, the "apply" method is called with each element (*node*) that matches your selector. So in this method simply 
+remove it. We reference the node, then select it's parent, and use the "removeChild" method to remove this very node.
+
+It is easy enough to write a Transformation, but it is even easier to put it to use. 
+
+If we go back to the code where we are manipulating our templates, we can add one more line to apply our Transformation.
+
+```
+try {
+    $page = Templado\Engine\Templado::loadHtmlFile(
+        new Templado\Engine\FileName(__DIR__ . '/html/viewmodel.xhtml')
+    );
+    $page->applyViewModel(new ViewModel());
+    
+    $page->applyTransformation(new PropertyRemoverTransformation());
+
+    echo $page->asString() . "\n";
+
+} catch (Templado\Engine\TempladoException $e) {
+    foreach($e->getErrorList() as $error) {
+        echo (string)$error;
+    }
+}
+```
+
+And that's it! In the final output, all elements containing the "property" attribute would be gone.
+
+I mentioned that there are two Classes in Templado that can be used to create a Selector. We used XPathSelector in this 
+example, but the other is Templado\Engine\CSSSelector. It extends the XPathSelector, and allows you to use CSS syntax 
+instead of XPath. Either way, Transformations are easy to use and a powerful way to modify your document.
+
+
+
 ## Examples
 
 Usage examples can be found in the [example project](https://github.com/templado/examples)
