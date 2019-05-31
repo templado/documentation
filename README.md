@@ -1105,4 +1105,3 @@ good luck templating with Templado, and please let us know what you think.
 ## Examples
 
 Usage examples can be found in the [example project](https://github.com/templado/examples)
-Usage examples can be found in the [example project](https://github.com/templado/examples)
