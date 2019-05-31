@@ -585,9 +585,128 @@ methods to them. Templado already knows where to find it!
 
 
 ### Forms
-Coming Soon!
 
-...
+Forms are a bit of a special case in templating. Though there may be times that you do want to dynamically set field 
+attributes (*which can be handled with the methods discussed above*), one important need is that of populating the form 
+fields with the supplied data. And though technically, with some forethought, you could handle the particulars of each 
+field with the methods discussed above, Templado simplifies this task for you through the Templado\Engine\FormData Object.
+
+Instantiating a FormData Object is easy. The constructor takes two parameters. The first is an identifier for the form, 
+which can be either the form "name" or "id" attribute. The second is simply an array where the keys are the field names, 
+and the values are, of course, the field values (*coincidentally, just as the post data of the form would look* ;).
+
+So if you have a form in your template that looks like this:
+
+```
+<form id="user-form">
+    <p><label for="name">Name: </label><input id="name" name="name" /></p>
+    <p><label for="email">Email: </label><input id="email" name="email" /></p>
+    <p><label for="address">Phone: </label><input id="phone" name="phone" /></p>
+    <p>
+        <label for="gender">Gender: </label>
+        <select id="gender" name="gender">
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+        </select>
+    </p>
+    <p><label for="description">Description: </label></p>
+    <p><textarea id="description" name="description" rows="3" cols="32"></textarea></p>
+    <p><label for="available">Available: </label><input type="checkbox" id="available" name="available" value="yes" /></p>
+    <p>Handed::
+        <label for="handed-left">Left: </label><input type="radio" id="handed-left" name="handed" value="left" />
+        <label for="handed-right">Right: </label><input type="radio" id="handed-right" name="handed" value="right" />
+    </p>
+    <button>submit</button>
+</form>
+```  
+
+And you have form data that looks like this:
+
+```
+$formValues = [
+    'name' => 'Boo Radley',
+    'email' => 'boo@templado.com',
+    'phone' => '555-1212',
+    'gender' => 'male',
+    'description' => 'Reserved, but thoughtful and kind fellow',
+    'available' => 'yes',
+    'handed' => 'right'
+];
+``` 
+
+You simply instantiate a FormData Object like this:
+
+```
+$formData = new Templado\Engine\FormData('user-form', $formValues);
+```
+
+And going back to our original template and data pairing code, apply it using the "applyFormData" method like this:
+
+```
+try {
+    $page = Templado::loadHtmlFile(
+        new FileName(__DIR__ . '/html/form.xhtml')
+    );
+    
+    $page->applyFormData($formData);
+
+    echo $page->asString();
+
+} catch (TempladoException $e) {
+    foreach($e->getErrorList() as $error) {
+        echo (string)$error;
+    }
+}
+```
+And now your rendered form will have each field properly populated. *It should be noted that the FormData Object can also 
+handle multi-dimensional form data arrays*. 
+
+While we are on the subject of forms, there is one more Templado feature that applies here. You are hopefully familiar 
+with Cross-Site Request Forgery (**CSRF**). A full explanation of this security issue is well beyond the scope of this 
+documentation. You can find more information about it [here](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+
+A suggested method to protect against CSRF is the Synchronizer Token Pattern (**STP**), which involves adding a unique 
+(*and unpredictable*) token to a hidden field when posting your form. Then of course, validating that token when processing 
+of the form. 
+
+Templado lets you dynamically add the hidden field to your form using the Templado\Engine\CSRFProtector Object. To 
+instantiate this Object, you simply pass in a name for your (*soon to be*) field, and a token. **It is important to note 
+that how you generate and track your token is up to you**. 
+
+But once you have a token, you can create the CSRFProtector like this:
+
+```
+$csrfProtector = new Templado\Engine\CSRFProtector('csrf-token', 'somelongtokenstring');
+```
+
+In this example we are naming our future hidden field 'csrf-token' (*the name is up to you*). Obviously, the token 
+itself would be different. 
+
+And we can add it to our form using the "applyCSRFProtection" method like this (*following the above form example*):
+
+```
+try {
+    $page = Templado::loadHtmlFile(
+        new FileName(__DIR__ . '/html/form.xhtml')
+    );
+    
+    $page->applyCSRFProtection($csrfProtector);
+    
+    $page->applyFormData($formData);
+
+    echo $page->asString();
+
+} catch (TempladoException $e) {
+    foreach($e->getErrorList() as $error) {
+        echo (string)$error;
+    }
+}
+```
+
+And now a new **hidden** input field will be rendered in your form with the name 'csrf-token', and a value of the token 
+you passed in. Now, with some validation on the backend, your form is safer.
+
+---
 
 So at this point we have pretty much covered all that you need to effectively create and manipulate basic templates. It 
 is simple to use, clean and leaves you with templates that can be displayed on their own as sample pages. 
