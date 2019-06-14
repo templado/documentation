@@ -126,13 +126,18 @@ markup elements.
 
 ### Elements and Attributes
 
+Templado makes use of four standard attributes in your markup elements ("property", "resource", "prefix", and "typeOf"). 
+If you are not familiar, these attributes are all standard recommendations from the [RFDa](https://en.wikipedia.org/wiki/RDFa) 
+and are a means of incorporating rich metadata into documents. We will cover each of these, but let's start with the 
+"property" attribute since this is likely the most common usage. 
+
 Let's say that you have a header tag in your template. 
 
 ```
 <h1>Some Title</h1>
 ```
 
-Templado looks for an attribute in each element specifically named "property". If it finds one, it looks for a method in 
+Templado looks at each element to see if it has a "property" attribute. If it finds one, it looks for a method in 
 your View Model who's name matches the attribute's value.
 
 ```
@@ -507,11 +512,19 @@ example, set a flag in our Email object to signify the "current" or "preferred" 
 dynamically. The options become almost limitless for you as you create more complex templates. The nesting and dynamic 
 complexity is up to you and the requirements of your project.
 
-### Special Attributes - Prefix and Resource
+### The Other Special Attributes - Prefix, Resource and typeOf
 
-There are two *special* attribute features in Templado. The first is called "prefix", and is simply a way to alias 
-(or namespace) your properties. Let's say that you have a property called "user" that you want to reference multiple 
-times. You can use the "prefix" attribute in place of the "property" attribute to accomplish this:
+As we mentioned in the beginning, Templado makes use of four RFDa recommended attributes. We covered the "property" 
+attribute so what about these others. As should be clear, the "property" attribute gives Templado a context (scope) 
+within which to work. However there may be times (for various reasons) that the context needs to change. Both "prefix" 
+and "resource" provide a means to do that. They are all somewhat similar in that way, yet each one has its own 
+specific usage. The "typeof" attribute is a little different, so we will save that one for last. Let's go over each of 
+these attributes one by one. 
+
+#### Prefix
+Let's start with the "prefix" attribute. It is simply a way to alias (or namespace) your properties. Let's say that you 
+have a property called "user" that you want to reference multiple times. You can use the "prefix" attribute in place of 
+the "property" attribute to accomplish this:
 
 ```
 <div prefix="u user">
@@ -537,11 +550,11 @@ But now we can reference it from anywhere else in our template. Notice that the 
 **outside** of the user element. This can be quite useful if you have the need to reference the user property several 
 times (or in several places) within your template. 
 
----
+#### Resource
 
-The second special attribute is called "resource". It is similar to prefix in that it is also used in place of the 
+Let's move on to the "resource" attribute. It is similar to prefix in that it is also used in place of the 
 property attribute, and it is also a way that we can reference a property's methods elsewhere in our template. The 
-important difference is that resource tells Templado to look back to our main (*top level*) View Model. This is quite 
+important difference is that "resource" tells Templado to look back to our main (*top level*) View Model. This is quite 
 useful in situations where a property is nested within the scope of another property in your template. 
  
 Let's say that you want to display "user" information in two (*or more*) different sections in your template. And each 
@@ -602,6 +615,133 @@ class ViewModel {
 Each of the Section Models would define their own "name" method in our example, but there is no need to add the user 
 methods to them. Templado already knows where to find it!
 
+#### typeOf
+
+Finally, let's discuss the "typeOf" attribute. This one works a bit differently than the others. Rather than replacing 
+the "property" attribute, "typeOf" is used in conjunction with it. Also, rather than changing the context of the View Model 
+being used, the "typeof" attribute gives you a way to conditionally change your template. It allows you to create 
+multiple ways that an element could be displayed, and then select which version to use at rendering time.
+
+Let's go back to our User example. Say you have three different kinds of Users. A standard User, a Commenter, and a 
+Moderator (to use a very contrived example). When you display a standard User, you want it to look like it did in our 
+previous examples - with a name and email addresses. However when you display a Moderator, you want to show that it is a 
+Moderator, and you do not want to display the Moderator's email address(es). And when it is a commenter, you only want to 
+display the name, and this User's rating - which a number rating from 1 to 5.
+
+In this case, you can create a template that contains all three display versions. And identify each using the "typeof" 
+attribute.
+
+```
+... 
+
+<div property="user" typeof="standard">
+    <p>Name: <span property="name">Original Name</span></p>
+    <div>
+        <span>EMail:</span>
+        <ul>
+            <li property="emailLinks"><a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a></li>
+        </ul>
+    </div>
+</div>
+
+<div property="user" typeof="moderator">
+    <p>Moderator: <span property="name">Original Name</span></p>
+</div>
+
+<div property="user" typeof="commentor">
+    <p>
+        Commenter: <span property="name">Original Name</span> 
+        Rating: <span property="rating">5</span>
+    </p>
+</div>
+
+... 
+
+```
+
+Notice that each of the three main divs has a "property" of "user". But each has a different "typeof".
+
+When Templado finds a "typeof" attribute, it look to the current View Model for a method specifically called "typeof". 
+This "typeof" method should return a string that matches one of template occurrences. 
+
+So now if our User Model is modified to look like this:
+
+```
+class User {
+
+    public function name() {
+        return 'Willi Wichtig';
+    }
+
+    public function emailLinks() {
+        return [
+            new EMailLink(
+                new Email('willi@wichtig.de')
+            ),
+            new EMailLink(
+                new Email('second@secondis.de')
+            )
+        ];
+    }
+
+    public function rating()
+    {
+        return '3';
+    }
+
+    public function typeof()
+    {
+        return 'standard';
+    }
+}
+```
+
+Templado would first look for the "typeof" method in the current View Model. It sees that, in this case, "standard" is 
+returned. So it looks back to our template, and ONLY renders the User element that has been identified as "standard". 
+The other two are removed. 
+
+```
+
+<div property="user" typeof="standard">
+    <p>Name: <span property="name">Willi Wichtig</span></p>
+    <div>
+        <span>EMail:</span>
+        <ul>
+            <li property="emailLinks"><a property="email" href="mailto:willi@wichtig.de" class="current">willi@wichtig.de</a></li>
+            <li property="emailLinks"><a property="email" href="mailto:second@secondis.de" class="current">second@secondis.de</a></li>
+        </ul>
+    </div>
+</div>
+
+```
+
+If we go back to our User Model and simply change the "typeof" method to return "moderator", then our output would look 
+like this:
+
+```
+
+<div property="user" typeof="moderator">
+    <p>Moderator: <span property="name">Willi Wichtig</span></p>
+</div>
+
+```
+
+And if we changed the "typeof" method to return "commenter":
+
+```
+
+<div property="user" typeof="commentor">
+    <p>
+        Commenter: <span property="name">Willi Wichtig</span> 
+        Rating: <span property="rating">3</span>
+    </p>
+</div>
+
+```
+
+So you see, even from this silly example, that we can easily configure any number of template *views* for a given View Model, 
+and then switch views by simply updating the return value for one method. This gives you incredible control over your 
+templates, and so many options for how to configure things.
 
 ### Forms
 
@@ -680,6 +820,8 @@ try {
 And now your rendered form will have each field properly populated. *It should be noted that the FormData Object can also 
 handle multi-dimensional form data arrays*. 
 
+**It should also be noted that password fields and file type fields are excluded for security reasons.**
+
 While we are on the subject of forms, there is one more Templado feature that applies here. You are hopefully familiar 
 with Cross-Site Request Forgery (**CSRF**). A full explanation of this security issue is well beyond the scope of this 
 documentation. You can find more information about it [here](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
@@ -724,6 +866,9 @@ try {
 
 And now a new **hidden** input field will be rendered in your form with the name 'csrf-token', and a value of the token 
 you passed in. Now, with some validation on the backend, your form is safer.
+
+**Note: If a CSRF hidden field (with that name) already exists, rather than created a new filed, the existing field will 
+be used. Its value will be updated.
 
 ---
 
@@ -827,6 +972,9 @@ The final rendered page looks like this:
 </html>
 ```
 
+**Note: If an element with the specified "id" already exists in the template, it is replaced by the given Snippet. 
+However, if an element of that "id" does not exist, it is created at that point, and added as a new child.
+
 This is an extremely over-simplified example. In reality, if this is all that you wanted to do, it would be easier, and 
 cleaner to just write out the template code, and use property attributes. But this gives you an idea of what Snippets 
 can do.
@@ -919,7 +1067,13 @@ $page->applyViewModel(new ViewModel());
 ```
 
 **If you have not read the previous documentation on View Models and the property attribute, now would be a good to do so**. 
-Otherwise, you understand that now you would get a fully rendered page.
+Otherwise, you understand that you would now get a fully rendered page.
+
+Of course, it is also important to note that the "applyViewModel" method works with fragments as well. This means that 
+you could change the order of operations. You can create the fragment, apply a View Model, create the Snippet from the 
+rendered fragment, and apply that to your final document.
+
+This is quite useful if you want to combine static assets with dynamically created Snippets.
 
 Additionally it should be pointed out that, since you can load the code fragments from a file, it would be trivial to 
 create well organized, reusable code fragment files.   
@@ -938,9 +1092,9 @@ be any number of reasons. The question is how.
 
 Templado gives you two options for handling these situations - Transformations and Filters. Let's start with Transformations.
 
-Let's say that you have a template which, for whatever reason, you decide that you want to remove all elements with a 
-specific attribute. This example is, of course contrived, but let's say that you want to remove all of the elements that 
-have our "property" attribute. Templado gives you the option of writing and applying a Transformation.
+Perhaps we decide that we do not want our final rendered markup to contain any of the RFDa attributes we used. These 
+attributes were for our templating purposes, and are superfluous once the rendering is complete. We can do this. 
+Templado gives you the option of writing and applying a Transformation.
 
 Templado\Engine\Transformation is an Interface with just two methods defined - "getSelector" and "apply". 
 
@@ -950,15 +1104,25 @@ The "getSelector" method is used to define which elements of the document you wo
 You could implement the Transformation Interface like this:
 
 ```
-class PropertyRemoverTransformation implements Transformation
-{
+class StripRDFaAttributesTransformation implements Transformation {
+
+    /** @var string[] */
+    private $attributes = ['property', 'resource', 'prefix', 'typeof'];
+
     public function getSelector(): Selector {
-        return new XPathSelector('//*[@property]');
+        return new XPathSelector('//*[@' . implode(' or @', $this->attributes) . ']');
     }
 
     public function apply(DOMNode $context) {
-        $context->parentNode->removeChild($context);
+        if (!$context instanceof \DOMElement) {
+            return;
+        }
+
+        foreach($this->attributes as $attribute) {
+            $context->removeAttribute($attribute);
+        }
     }
+
 }
 ```
 
@@ -967,11 +1131,12 @@ Templado\Engine\Selector. Templado has two built in Classes that can help you wi
 Templado\Engine\XPathSelector to define the Selector using XPath syntax. If you aren't familiar with this syntax you can 
 find a nice explanation [here](https://www.w3schools.com/xml/xpath_syntax.asp)
 
-So in our example above, we instantiate a new XPathSelector using the syntax to select all elements with that contain the 
-"property" attribute. 
+So in our example above, we instantiate a new XPathSelector using the syntax to select all elements that contain any of 
+the four RDFa attributes. As you can see, we have a private array containing the four attributes, and then use PHP's 
+"implode" method to create the selector string. And we return that.
 
-Internally, the "apply" method is called with each element (*node*) that matches your selector. So in this method simply 
-remove it. We reference the node, then select it's parent, and use the "removeChild" method to remove this very node.
+Internally, the "apply" method is called with each element (*node*) that matches the selector. We make sure that what was 
+passed in is actually a DOMElement, and if so, we loop through the list of attributes and delete them. 
 
 It is easy enough to write a Transformation, but it is even easier to put it to use. 
 
@@ -995,7 +1160,11 @@ try {
 }
 ```
 
-And that's it! In the final output, all elements containing the "property" attribute would be gone.
+And that's it! In the final output, all elements containing the RFDa attributes would be gone.
+
+**Note: if you think that's a pretty cool idea, you are in luck. The StripRDFaAttributesTransformation class is part of 
+the core Templado code. If you have other ideas for transforming your templates, you will need to write them yourself, but 
+this Transformation can be used out of the box.
 
 I mentioned that there are two Classes in Templado that can be used to create a Selector. We used XPathSelector in this 
 example, but the other is Templado\Engine\CSSSelector. It extends the XPathSelector, and allows you to use CSS syntax 
@@ -1098,6 +1267,10 @@ For XML it is similar, but with a few slight differences. First the Mapper is ca
 instantiate that one. Then instead of a string, this Mapper expects either a PHP DOMDocument, or a DOMElement. So you 
 would need to create one of those from your XML, and then pass it to the appropriate method - either the 
 "fromDomDocument" method, or the "fromDomElement". Kind of makes since if you think about it, huh?!
+
+**Note: The mappers are meant as mere helpers to have a generic mapping from json data structures into view models. They 
+are not a part of the engine repository, because they are not the recommended way of doing things. It is generally better 
+to write your own View Models.**
 
 Anyway, that is it. For more in depth usage of the mappers, look to the documentation for the Mapper repository. Otherwise, 
 good luck templating with Templado, and please let us know what you think.
