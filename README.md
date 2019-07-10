@@ -881,9 +881,9 @@ These options give you full control over your final output.
 ### Snippets
 
 Some templates, depending on your project and the requirements, can get a little complex. Perhaps, in these situations 
-it would be nice to break the template down into smaller parts. Or maybe, there are sections of your template that 
-contain a lot of duplicated code. This is where Snippets come in. They allow you write smaller, more manageable pieces 
-of code, and then pull them all together on the fly.
+it would be nice to break the template down into smaller parts. Or maybe you have reusable static code blocks, and/or 
+module elements that you don't want to keep duplicating. This is where Snippets come in. They allow you write smaller, 
+more manageable pieces of code, and then pull them all together on the fly.
 
 Let's start as simply as possible, and you will immediately see how the possibilities of use are almost unlimited.
 
@@ -909,7 +909,14 @@ Now you want to add a page title to the existing header div. So you create a sim
 <h1>This Is A Simple Snippet Example</h1>
 ```
 
-We can use Templado Snippets to put them together like this:
+In order to temporarily make our partial code into valid XML we must first wrap it in a Templado namespace.
+The namespace looks like this:
+```
+<page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
+    
+</page:snippet>
+```
+But once we wrap our partial code, we can use Templado Snippets to put it all together like this:
 
 ```
 try {
@@ -918,12 +925,16 @@ try {
     );
 
     $snippetListCollection = new SnippetListCollection();
-
-    $sample   = new \DOMDocument();
-    $fragment = $sample->createDocumentFragment();
-    $fragment->appendXML('<h1>This Is A Simple Snippet Example</h1>);
     
-    $snippet = new SimpleSnippet('header', $fragment);
+    $partialCodeString = 
+        '<page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
+            <h1>This Is A Simple Snippet Example</h1>
+        </page:snippet>';
+        
+    $codeSample = new \DOMDocument();
+    $codeSample->loadXML($partialCodeString);
+    
+    $snippet = new TempladoSnippet('header', $codeSample);
 
     $snippetListCollection->addSnippet($snippet);
     
@@ -944,17 +955,18 @@ object using the static "loadHtmlFile" method.
 Next we initialize a SnippetListCollection. The "applySnippets" method that we use further down expects this collection 
 as its only parameter. So even if we are only adding one Snippet, it is still necessary to create the collection. 
 
-Now we turn our code fragment into a DOMNode. There are obviously many different DOMNodes objects, and ways to create 
-them. In this example we use a DOMDocumentFragment. This is accomplished by creating a new PHP DOMDocument, using the 
-"createDocumentFragment" method to get the actual fragment, and then passing in our code using the "appendXML" method. 
+We create our wrapped partial code string, using the Templado namespace, and then we turn our code fragment into a DOMNode. 
+There are obviously many different DOMNodes objects, and ways to create them. In this example we use a DOMDocument. 
+This is accomplished by creating a new PHP DOMDocument, and using the "loadXML" method. 
 
-Once we have a DOMNode, we can instantiate a new SimpleSnippet, which has two construction parameters. The first parameter 
-is the target id. In our example we reference the "header" div. The second parameter is the fragment, which will be appended 
-to the element of the target id (**if it exists**). As we just pointed out, this parameter is expected to be a DOMNode.
+Once we have a DOMNode, we can instantiate a new TempladoSnippet, which has two construction parameters. The first parameter 
+is the target id. In our example we reference the "header" div. The second parameter is the partial code (DOMNode), which 
+will be appended to the element of the target id (**if it exists**). 
 
 Now we simply add the Snippet to our Collection, and call the "applySnippets" method to complete the process. 
 
-The final rendered page looks like this:
+
+The final rendered page in our example looks like this:
 
 ```
 <?xml version="1.0" ?>
@@ -972,8 +984,13 @@ The final rendered page looks like this:
 </html>
 ```
 
-**Note: If an element with the specified "id" already exists in the template, it is replaced by the given Snippet. 
-However, if an element of that "id" does not exist, it is created at that point, and added as a new child.
+**Note:** If Templado does not find an element matching our target id, our Snippet is ignored. If an element that matches our target 
+id exists in our template, but is also the same kind of tag as the root of our Snippet (i.e in this case, instead of a div, 
+it were a header tag), then the Snippet is appended to the document after the target id element.
+
+**Note (to Note):** If you add an "id" attribute to the Templado namespace, then the above stated actions are different. 
+If a tag is found that matches both the target id given in the Templado namespace, AND the root tag type of your Snippet, 
+then the tag in the template is replaced (rather than the Snippet being appended after)!  
 
 This is an extremely over-simplified example. In reality, if this is all that you wanted to do, it would be easier, and 
 cleaner to just write out the template code, and use property attributes. But this gives you an idea of what Snippets 
@@ -981,13 +998,13 @@ can do.
 
 Let's go a little deeper. 
 
-We can nest our Snippets. By doing so you start to see the power behind them. If we simply add an id to our first Snippet, 
+We can nest our Snippets. By doing so, you start to see the power behind them. If we simply add an id to our first Snippet, 
 then we can add a second Snippet the references it. So we update our original fragment:
 
 ```
 ...
 
-$fragment->appendXML('<h1 id="main-title">This Is A Simple Snippet Example</h1>');
+$codeSample->loadXML('<h1 id="main-title">This Is A Simple Snippet Example</h1>');
 ``` 
 
 And add our second Snippet:
@@ -1039,21 +1056,23 @@ Let's modify our example again. But this time let's create a more complex fragme
 ... 
 
 $xhtml = <<<xhtml
-    <h1 id="main-title">This Is A Simple Snippet Example And Then Some</h1>
-    <div property="user">
-    <p>Name: <span property="name">Original Name</span></p>
-        <span>EMail:</span>
-        <ul>
-            <li property="emailLinks">
-                <a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a>
-            </li>
-        </ul>
-    </div>
+    <page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
+        <h1 id="main-title">This Is A Simple Snippet Example And Then Some</h1>
+        <div property="user">
+        <p>Name: <span property="name">Original Name</span></p>
+            <span>EMail:</span>
+            <ul>
+                <li property="emailLinks">
+                    <a property="email" href="mailto:original@domain.tld" class="current">original@domain.tld</a>
+                </li>
+            </ul>
+        </div>
+    </page:snippet>
 xhtml;
 
-$fragment->appendXML($xhtml);
+$codeSample->loadXML($xhtml);
 
-$snippet = new SimpleSnippet('header', $fragment);
+$snippet = new TempladoSnippet('header', $codeSample);
 
 $snippetListCollection->addSnippet($snippet);
 
@@ -1069,14 +1088,28 @@ $page->applyViewModel(new ViewModel());
 **If you have not read the previous documentation on View Models and the property attribute, now would be a good to do so**. 
 Otherwise, you understand that you would now get a fully rendered page.
 
-Of course, it is also important to note that the "applyViewModel" method works with fragments as well. This means that 
-you could change the order of operations. You can create the fragment, apply a View Model, create the Snippet from the 
-rendered fragment, and apply that to your final document.
+Of course, it is also important to note that you can also change the order of operations here. You can quite easily load 
+partial code as a Templado\Html Object, apply a ViewModel to get a rendered partial code block, and load that as a Snippet, 
+and apply it to a more complex page document.
 
 This is quite useful if you want to combine static assets with dynamically created Snippets.
 
-Additionally it should be pointed out that, since you can load the code fragments from a file, it would be trivial to 
+Additionally it should be pointed out that, since you can load the partial code from a file, it would be trivial to 
 create well organized, reusable code fragment files.   
+
+Which brings us to one final Snippet feature - SnippetLoader.
+
+One way that you can create Snippets from a file, is with Templado\SnippetLoader. It basically has one public function 
+called "load", which takes in a Templado\FileName.
+
+If all you want to do is add a simple TextNode, then you can just create a file with your text. Of course, you will still 
+want to wrap the text in a Templado namespace like in the above example. But other than that, you can simply instantiate 
+a SnippetLoader, load your file, and pass the Text Snippet along.
+
+For more complex Snippets, you will want to add a DOCTYPE declaration to your file as well, so that Templado knows what 
+kind of document it is working with.
+
+But again, all that is necessary is to call the load function, and you will get back a proper Snippet. 
 
 And there you have it. We could keep adding more and more complex examples, but it should be clear at this point just 
 how powerful this is. You can easily create more complex blocks of code that can be assembled in any number of ways. 
