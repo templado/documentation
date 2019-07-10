@@ -48,7 +48,7 @@ The preferred method for installing Templado is to simply add it to your project
 
 If you are manually creating or editing the composer.json file:
 
-```
+```json
 "require" : {
     "templado/engine": "^3.0"
 }
@@ -56,7 +56,7 @@ If you are manually creating or editing the composer.json file:
 
 Or from the command line:
 
-```
+```bash
 # composer require templado/engine:^3.0
 ```
 
@@ -65,7 +65,7 @@ happen. In addition, you have the option of using either JSON, or XML (*More on 
 need to install the Mappers, which are in a separate repository.  
 
 
-```
+```json
 "require" : {
     "templado/engine": "^3.0"
     "templado/mappers": "^1.0"
@@ -74,7 +74,7 @@ need to install the Mappers, which are in a separate repository.
 
 or from the command line:
 
-```
+```bash
 # composer require templado/mappers:^1.0
 ```
 
@@ -88,7 +88,7 @@ templates to accomplish this. So the first thing we need to do is introduce them
 
 Here is an example of code to pair a data model with a template:
 
-```
+```php
 try {
     $page = Templado\Engine\Templado::loadHtmlFile(
         new Templado\Engine\FileName(__DIR__ . '/html/viewmodel.xhtml')
@@ -133,20 +133,20 @@ and are a means of incorporating rich metadata into documents. We will cover eac
 
 Let's say that you have a header tag in your template. 
 
-```
+```html
 <h1>Some Title</h1>
 ```
 
 Templado looks at each element to see if it has a "property" attribute. If it finds one, it looks for a method in 
 your View Model who's name matches the attribute's value.
 
-```
+```html
 <h1 property="headline">Some Title</h1>
 ```
 
 In this example, Templado would access the View Model for this template, and look for a method named "headline".
 
-```
+```php
 class ViewModel {
     public function headline() {
         return "The Actual Title";
@@ -157,7 +157,7 @@ class ViewModel {
 Continuing with this example, the method is returning a string, and so Templado would use the returned string as the 
 text value for the header:
 
-```
+```html
 <h1 property="headline">The Actual Title</h1>
 ```
 
@@ -165,13 +165,13 @@ It's that simple, and this will work for any HTML element. However it gets much 
 your View Model method can return an Object representing the HTML element. This Object can have methods that represent 
 any of the attributes of your HTML element ...
 
-```
+```html
 <h1 property="headline" title="A Title" class="a-class">Some Title</h1>
 ```
 
 In this example our header now has two attributes - "title" and "class". So we can create a class that looks like this:
 
-```
+```php
 class Headline {
     public function title() {
         return "Awsome Title";
@@ -189,7 +189,7 @@ class Headline {
 
 And then return a new instance of our Headline object from the View Model method.
 
-```
+```php
 class ViewModel {
     public function headline() {
         return new Headline();
@@ -204,7 +204,7 @@ element in the template.
 
 Now our header will render like this:
 
-```
+```html
 <h1 property="headline" title="Awsome Title" class="cool-class">The Actual Title</h1>
 ```
 
@@ -212,7 +212,7 @@ In addition, if for any reason you have an attribute in your template, but you w
 you can simply return false from the method. So if our Headline object returned false for the class method, our rendered 
 header would then look like this:
 
-```
+```html
 <h1 property="headline" title="Awsome Title">The Actual Title</h1>
 ```
 
@@ -223,7 +223,7 @@ parameter, then the value is passed in.
 
 So let's say your Object looks like this now: 
 
-```
+```php
 class Headline {
     public function title() {
         return "Awsome Title";
@@ -244,7 +244,7 @@ the class from the template with our new class, and return that.
 
 So now our header would render like this:
 
-```
+```html
 <h1 property="headline" title="Awsome Title" class="a-class cool-class">The Actual Title</h1>
 ```
 
@@ -264,7 +264,7 @@ of the number of items that will need to be shown. This is not an issue.
 
 In your template you can create the unordered list with a single list item element, and give it a "property" attribute:
 
-```
+```html
 <ul>
     <li property="items">Item 1</li>
 </ul> 
@@ -272,7 +272,7 @@ In your template you can create the unordered list with a single list item eleme
 
 Then in your View Model, the "items" method can return an array of list items:
 
-```
+```php
 class ViewModel {
     public function items() {
         return [
@@ -286,7 +286,7 @@ class ViewModel {
 
 In this case the rendered elements would like this:
 
-```
+```html
 <ul>
     <li property="items">Item 1</li>
     <li property="items">Item 2</li>
@@ -300,7 +300,7 @@ list item element ... just as before.
 
 In the template:
 
-```
+```html
 <ul>
     <li property="items" class="odd">Item 1</li>
 </ul> 
@@ -308,7 +308,7 @@ In the template:
 
 In the View Model:
 
-```
+```php
 class ViewModel {
     public function items() {
         return [
@@ -322,7 +322,7 @@ class ViewModel {
 
 And of course you would need an Item class:
 
-```
+```php
 class Item {
     /**
      * @var string
@@ -351,7 +351,7 @@ class Item {
 
 And now the rendered elements would like this:
 
-```
+```html
 <ul>
     <li property="items" class="odd">Item 1</li>
     <li property="items" class="even">Item 2</li>
@@ -371,7 +371,7 @@ This is not a problem. With Templado, you can add as many elements as you deem n
 
 So your template can look like this:
 
-```
+```html
 <ul>
     <li property="items" class="odd">Item 1</li>
     <li property="items" class="even">Item 2</li>
@@ -383,7 +383,7 @@ So your template can look like this:
 
 But your rendered elements will still look like this if we use the View Model from before:
 
-```
+```html
 <ul>
     <li property="items" class="odd">Item 1</li>
     <li property="items" class="even">Item 2</li>
@@ -404,7 +404,7 @@ your View Models.
 
 Take this template as an example:
 
-```
+```html
 <div property="user">
     <p>Name: <span property="name">Original Name</span></p>
     <div>
@@ -423,7 +423,7 @@ have 3 levels of nesting.
 
 So our View Model will follow this schema as follows:
 
-```
+```php
 class ViewModel {
     public function user() {
         return new User();
@@ -433,7 +433,7 @@ class ViewModel {
 
 And the User:
 
-```
+```php
 class User {
 
     public function name() {
@@ -459,7 +459,7 @@ When the scope changes in the template, it follows in the Models. So now Templad
 So each EmailLink is rendered in the list, and the Templado looks to each of the EmailLink objects to resolve the 
 email property. So our EmailLink object looks like this:
 
-```
+```php
 class EMailLink {
 
     /** @var  Email */
@@ -481,7 +481,7 @@ class EMailLink {
 And finally, our Email object corresponds to an anchor element in our template. So Templado is looking for methods which 
 match the attributes of the anchor:
 
-```
+```php
 class Email {
 
     /** 
@@ -526,7 +526,7 @@ Let's start with the "prefix" attribute. It is simply a way to alias (or namespa
 have a property called "user" that you want to reference multiple times. You can use the "prefix" attribute in place of 
 the "property" attribute to accomplish this:
 
-```
+```html
 <div prefix="u user">
     <p>Name: <span property="u:name">Original Name</span></p>
 </div>
@@ -562,7 +562,7 @@ of these instances of user in nested within the scope of another property. Rathe
 within each of the parent Property Models, your can define the user method within the top level View Model, and then use 
 the resource attribute to reference it there.
 
-```
+```html
 <div property="sectionOne">
     <h2 property="sectionTitle">Section Title</h2>
     <div resource="user">
@@ -596,7 +596,7 @@ the resource attribute to reference it there.
 In this case user is nested with the scope of the sections (one and two), but because we used resource instead of 
 property, Templado will look to our original View Model, rather than the Section Models. 
 
-```
+```php
 class ViewModel {
     public function sectionOne() {
         return new SectionOne();
@@ -631,7 +631,7 @@ display the name, and this User's rating - which a number rating from 1 to 5.
 In this case, you can create a template that contains all three display versions. And identify each using the "typeof" 
 attribute.
 
-```
+```html
 ... 
 
 <div property="user" typeof="standard">
@@ -666,7 +666,7 @@ This "typeof" method should return a string that matches one of template occurre
 
 So now if our User Model is modified to look like this:
 
-```
+```php
 class User {
 
     public function name() {
@@ -700,8 +700,7 @@ Templado would first look for the "typeof" method in the current View Model. It 
 returned. So it looks back to our template, and ONLY renders the User element that has been identified as "standard". 
 The other two are removed. 
 
-```
-
+```html
 <div property="user" typeof="standard">
     <p>Name: <span property="name">Willi Wichtig</span></p>
     <div>
@@ -712,31 +711,26 @@ The other two are removed.
         </ul>
     </div>
 </div>
-
 ```
 
 If we go back to our User Model and simply change the "typeof" method to return "moderator", then our output would look 
 like this:
 
-```
-
+```html
 <div property="user" typeof="moderator">
     <p>Moderator: <span property="name">Willi Wichtig</span></p>
 </div>
-
 ```
 
 And if we changed the "typeof" method to return "commenter":
 
-```
-
+```html
 <div property="user" typeof="commentor">
     <p>
         Commenter: <span property="name">Willi Wichtig</span> 
         Rating: <span property="rating">3</span>
     </p>
 </div>
-
 ```
 
 So you see, even from this silly example, that we can easily configure any number of template *views* for a given View Model, 
@@ -756,7 +750,7 @@ and the values are, of course, the field values (*coincidentally, just as the po
 
 So if you have a form in your template that looks like this:
 
-```
+```html
 <form id="user-form">
     <p><label for="name">Name: </label><input id="name" name="name" /></p>
     <p><label for="email">Email: </label><input id="email" name="email" /></p>
@@ -781,7 +775,7 @@ So if you have a form in your template that looks like this:
 
 And you have form data/values that looks like this:
 
-```
+```php
 $formValues = [
     'name' => 'Boo Radley',
     'email' => 'boo@templado.com',
@@ -795,13 +789,13 @@ $formValues = [
 
 You simply instantiate a FormData Object like this:
 
-```
+```php
 $formData = new Templado\Engine\FormData('user-form', $formValues);
 ```
 
 And going back to our original template and data pairing code, apply it using the "applyFormData" method like this:
 
-```
+```php
 try {
     $page = Templado::loadHtmlFile(
         new FileName(__DIR__ . '/html/form.xhtml')
@@ -836,7 +830,7 @@ that how you generate and track your token is up to you**.
 
 But once you have a token, you can create the CSRFProtector like this:
 
-```
+```php
 $csrfProtector = new Templado\Engine\CSRFProtector('csrf-token', 'somelongtokenstring');
 ```
 
@@ -845,7 +839,7 @@ itself would be different.
 
 And we can add it to our form using the "applyCSRFProtection" method like this (*following the above form example*):
 
-```
+```php
 try {
     $page = Templado::loadHtmlFile(
         new FileName(__DIR__ . '/html/form.xhtml')
@@ -889,7 +883,7 @@ Let's start as simply as possible, and you will immediately see how the possibil
 
 Say we have the following template code:
 
-```
+```html
 <?xml version="1.0" ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -905,7 +899,7 @@ Say we have the following template code:
 
 Now you want to add a page title to the existing header div. So you create a simple code snippet:
 
-```
+```html
 <h1>This Is A Simple Snippet Example</h1>
 ```
 
@@ -918,7 +912,7 @@ The namespace looks like this:
 ```
 But once we wrap our partial code, we can use Templado Snippets to put it all together like this:
 
-```
+```php
 try {
     $page = Templado::loadHtmlFile(
         new FileName(__DIR__ . '/html/basic.xhtml')
@@ -968,7 +962,7 @@ Now we simply add the Snippet to our Collection, and call the "applySnippets" me
 
 The final rendered page in our example looks like this:
 
-```
+```html
 <?xml version="1.0" ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1001,7 +995,7 @@ Let's go a little deeper.
 We can nest our Snippets. By doing so, you start to see the power behind them. If we simply add an id to our first Snippet, 
 then we can add a second Snippet the references it. So we update our original fragment:
 
-```
+```php
 ...
 
 $codeSample->loadXML('<h1 id="main-title">This Is A Simple Snippet Example</h1>');
@@ -1022,7 +1016,7 @@ object with our addition text, create the SimpleSnippet, and add it to the colle
 
 And of course, we apply the SnippetListCollection
 
-```
+```php
 ...
 
 $page->applySnippets($snippetListCollection);
@@ -1030,7 +1024,7 @@ $page->applySnippets($snippetListCollection);
 
 Now our final output will look like this:
 
-```
+```html
 <?xml version="1.0" ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -1052,7 +1046,7 @@ apply View Models to it.
 
 Let's modify our example again. But this time let's create a more complex fragment:
 
-```
+```php
 ... 
 
 $xhtml = <<<xhtml
@@ -1081,7 +1075,7 @@ $page->applySnippets($snippetListCollection);
  
 Once we have added our extended Snippet to our base template, but before we render it, we can apply our View Model:
 
-```
+```php
 $page->applyViewModel(new ViewModel());
 ```
 
@@ -1136,7 +1130,7 @@ The "getSelector" method is used to define which elements of the document you wo
 
 You could implement the Transformation Interface like this:
 
-```
+```php
 class StripRDFaAttributesTransformation implements Transformation {
 
     /** @var string[] */
@@ -1175,7 +1169,7 @@ It is easy enough to write a Transformation, but it is even easier to put it to 
 
 If we go back to the code where we are manipulating our templates, we can add one more line to apply our Transformation.
 
-```
+```php
 try {
     $page = Templado\Engine\Templado::loadHtmlFile(
         new Templado\Engine\FileName(__DIR__ . '/html/viewmodel.xhtml')
@@ -1220,7 +1214,7 @@ method. One of these Filters truncates any left over empty HTML tags, and the ot
 
 Let's take a look at the empty element Filter as a usage example:
 
-```
+```php
 class EmptyElementsFilter implements Filter {
 
     public function apply(string $content): string {
@@ -1265,7 +1259,7 @@ As stated previously, this Filter, and the Namespace Filter are built into the "
 create a Filter of your own, you can simply pass it in as a parameter. So if you have a custom Filter called 
 "BadTagRemoverFilter", you could use it like this:
 
-```
+```php
 ...
 
 $page->asString(new BadTagRemoverFilter());
@@ -1285,7 +1279,7 @@ There is one final thing to point out. In the beginning, the method of using PHP
 engine relies on these View Models. However there is a separate repository in the Templado family that has two Mappers - 
 A JSON Mapper, and an XML Mapper. The usage for either one is mostly the same, and very simple:
 
-```
+```php
 $input = file_get_contents(__DIR__ . '/viewmodel/viewmodel.json');
 $mapper = new JsonMapper();
 $obj = $mapper->fromString($input);
