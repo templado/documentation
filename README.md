@@ -455,9 +455,9 @@ class User {
 ```
 
 When the scope changes in the template, it follows in the Models. So now Templado is looking at the User Model for the 
-"name" and "emailLinks" methods. Notice that the "emailLinks" method is returning an array of EmailLink objects.
-So each EmailLink is rendered in the list, and the Templado looks to each of the EmailLink objects to resolve the 
-email property. So our EmailLink object looks like this:
+"name" and "emailLinks" methods. We see that the "emailLinks" method is returning an array of EmailLink objects.
+So each EmailLink is rendered in the list, and then Templado looks to each of the EmailLink objects to resolve the 
+email property. And our EmailLink object looks like this:
 
 ```php
 class EMailLink {
@@ -478,7 +478,7 @@ class EMailLink {
 }
 ```
 
-And finally, our Email object corresponds to an anchor element in our template. So Templado is looking for methods which 
+Finally, our Email object corresponds to an anchor element in our template. So Templado is looking for methods which 
 match the attributes of the anchor:
 
 ```php
@@ -512,7 +512,7 @@ example, set a flag in our Email object to signify the "current" or "preferred" 
 dynamically. The options become almost limitless for you as you create more complex templates. The nesting and dynamic 
 complexity is up to you and the requirements of your project.
 
-### The Other Special Attributes - Prefix, Resource and typeOf
+### The Other Special Attributes - Prefix, Resource and TypeOf
 
 As we mentioned in the beginning, Templado makes use of four RFDa recommended attributes. We covered the "property" 
 attribute so what about these others. As should be clear, the "property" attribute gives Templado a context (scope) 
@@ -615,10 +615,10 @@ class ViewModel {
 Each of the Section Models would define their own "name" method in our example, but there is no need to add the user 
 methods to them. Templado already knows where to find it!
 
-#### typeOf
+#### TypeOf
 
-Finally, let's discuss the "typeOf" attribute. This one works a bit differently than the others. Rather than replacing 
-the "property" attribute, "typeOf" is used in conjunction with it. Also, rather than changing the context of the View Model 
+Finally, let's discuss the "typeof" attribute. This one works a bit differently than the others. Rather than replacing 
+the "property" attribute, "typeof" is used in conjunction with it. Also, rather than changing the context of the View Model 
 being used, the "typeof" attribute gives you a way to conditionally change your template. It allows you to create 
 multiple ways that an element could be displayed, and then select which version to use at rendering time.
 
@@ -834,8 +834,8 @@ But once you have a token, you can create the CSRFProtector like this:
 $csrfProtector = new Templado\Engine\CSRFProtector('csrf-token', 'somelongtokenstring');
 ```
 
-In this example we are naming our future hidden field 'csrf-token' (*the name is up to you*). Obviously, the token 
-itself would be different. 
+In this example we are naming our future hidden field 'csrf-token' (*the name is up to you*). *Obviously, the token 
+itself would be different.* 
 
 And we can add it to our form using the "applyCSRFProtection" method like this (*following the above form example*):
 
@@ -861,13 +861,13 @@ try {
 And now a new **hidden** input field will be rendered in your form with the name 'csrf-token', and a value of the token 
 you passed in. Now, with some validation on the backend, your form is safer.
 
-**Note: If a CSRF hidden field (with that name) already exists, rather than created a new filed, the existing field will 
+**Note: If a CSRF hidden field (with that name) already exists, rather than creating a new field, the existing field will 
 be used. Its value will be updated.
 
 ---
 
 So at this point we have pretty much covered all that you need to effectively create and manipulate basic templates. It 
-is simple to use, clean and leaves you with templates that can be displayed on their own as sample pages. 
+is simple to use, clean and leaves you with templates that can be displayed on their own as representational pages. 
 
 In our, final section we will cover a few slightly more abstract features - Snippets, Transformations, and Filters. 
 These options give you full control over your final output.
@@ -876,7 +876,7 @@ These options give you full control over your final output.
 
 Some templates, depending on your project and the requirements, can get a little complex. Perhaps, in these situations 
 it would be nice to break the template down into smaller parts. Or maybe you have reusable static code blocks, and/or 
-module elements that you don't want to keep duplicating. This is where Snippets come in. They allow you write smaller, 
+module elements that you don't want to keep duplicating. This is where Snippets come in. They allow you to write smaller, 
 more manageable pieces of code, and then pull them all together on the fly.
 
 Let's start as simply as possible, and you will immediately see how the possibilities of use are almost unlimited.
@@ -946,16 +946,16 @@ try {
 Let's walk through this code. First, just as with our simple examples from before, we instantiate a Templado\Engine\Html 
 object using the static "loadHtmlFile" method.
 
-Next we initialize a SnippetListCollection. The "applySnippets" method that we use further down expects this collection 
-as its only parameter. So even if we are only adding one Snippet, it is still necessary to create the collection. 
+Next we initialize a SnippetListCollection. *The "applySnippets" method that we use further down expects this collection 
+as its only parameter. So even if we are only adding one Snippet, it is still necessary to create the collection.* 
 
 We create our wrapped partial code string, using the Templado namespace, and then we turn our code fragment into a DOMNode. 
-There are obviously many different DOMNodes objects, and ways to create them. In this example we use a DOMDocument. 
+There are obviously many different DOMNode objects, and ways to create them. In this example we use a DOMDocument. 
 This is accomplished by creating a new PHP DOMDocument, and using the "loadXML" method. 
 
-Once we have a DOMNode, we can instantiate a new TempladoSnippet, which has two construction parameters. The first parameter 
-is the target id. In our example we reference the "header" div. The second parameter is the partial code (DOMNode), which 
-will be appended to the element of the target id (**if it exists**). 
+Once we have a DOMNode, we can instantiate a new Templado\Engine\TempladoSnippet, which has two construction parameters. 
+The first parameter is the target id. In our example we reference the "header" div. The second parameter is the partial 
+code (DOMNode), which will be appended to the element of the target id (**if it exists**). 
 
 Now we simply add the Snippet to our Collection, and call the "applySnippets" method to complete the process. 
 
@@ -1083,18 +1083,19 @@ $page->applyViewModel(new ViewModel());
 Otherwise, you understand that you would now get a fully rendered page.
 
 Of course, it is also important to note that you can also change the order of operations here. You can quite easily load 
-partial code as a Templado\Html Object, apply a ViewModel to get a rendered partial code block, and load that as a Snippet, 
-and apply it to a more complex page document.
+partial code as a Templado\Engine\Html Object, apply a ViewModel to get a rendered partial code block. Then load that as 
+a Snippet, and apply it to a more complex page document.
 
 This is quite useful if you want to combine static assets with dynamically created Snippets.
 
 Additionally it should be pointed out that, since you can load the partial code from a file, it would be trivial to 
 create well organized, reusable code fragment files.   
 
-Which brings us to one final Snippet feature - SnippetLoader.
+#### SnippetLoader
+Which brings us to one final Snippet feature - Templado\Engine\SnippetLoader.
 
-One way that you can create Snippets from a file, is with Templado\SnippetLoader. It basically has one public function 
-called "load", which takes in a Templado\FileName.
+One way that you can create Snippets from a file, is with Templado\Engine\SnippetLoader. It basically has one public function 
+called "load", which takes in a Templado\Engine\FileName.
 
 If all you want to do is add a simple TextNode, then you can just create a file with your text. Of course, you will still 
 want to wrap the text in a Templado namespace like in the above example. But other than that, you can simply instantiate 
@@ -1104,6 +1105,21 @@ For more complex Snippets, you will want to add a DOCTYPE declaration to your fi
 kind of document it is working with.
 
 But again, all that is necessary is to call the load function, and you will get back a proper Snippet. 
+
+```php
+...
+
+$snippetLoader = new SnippetLoader();
+
+$snippet = $snippetLoader->load(new FileName(__DIR__ . 'code_fragment.xhtml'));
+
+$snippetListCollection->addSnippet($snippet);
+
+$page->applySnippets($snippetListCollection);
+
+...
+
+```
 
 And there you have it. We could keep adding more and more complex examples, but it should be clear at this point just 
 how powerful this is. You can easily create more complex blocks of code that can be assembled in any number of ways. 
@@ -1122,6 +1138,8 @@ Templado gives you two options for handling these situations - Transformations a
 Perhaps we decide that we do not want our final rendered markup to contain any of the RFDa attributes we used. These 
 attributes were for our templating purposes, and are superfluous once the rendering is complete. We can do this. 
 Templado gives you the option of writing and applying a Transformation.
+
+#### Transformations
 
 Templado\Engine\Transformation is an Interface with just two methods defined - "getSelector" and "apply". 
 
@@ -1189,9 +1207,9 @@ try {
 
 And that's it! In the final output, all elements containing the RFDa attributes would be gone.
 
-**Note: if you think that's a pretty cool idea, you are in luck. The StripRDFaAttributesTransformation class is part of 
-the core Templado code. If you have other ideas for transforming your templates, you will need to write them yourself, but 
-this Transformation can be used out of the box.
+**Note: if you think that's a pretty cool idea, you are in luck. The Templado\Engine\StripRDFaAttributesTransformation 
+class is part of the core Templado code.** If you have other ideas for transforming your templates, you will need to write 
+them yourself, but this Transformation can be used out of the box.
 
 I mentioned that there are two Classes in Templado that can be used to create a Selector. We used XPathSelector in this 
 example, but the other is Templado\Engine\CSSSelector. It extends the XPathSelector, and allows you to use CSS syntax 
@@ -1200,6 +1218,8 @@ instead of XPath. Either way, Transformations are easy to use and a powerful way
 And this brings us to the final way that Templado equips you to control your output. Transformations are a great to 
 manipulate DOM nodes, but that heavy lifting can come at an efficiency cost by having to traverse all those nodes. This 
 is where Filters come in. And this is the last stop in the process before your document is fully rendered. 
+
+#### Filters
 
 When you call the "asString" method on your Templado\Engine\Html object, your document is serialized. At this point, you 
 get one last chance to modify that string. To do this Templado features the Templado\Engine\Filter interface, which has 
