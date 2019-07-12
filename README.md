@@ -67,7 +67,7 @@ need to install the Mappers, which are in a separate repository.
 
 ```json
 "require" : {
-    "templado/engine": "^3.0"
+    "templado/engine": "^3.0",
     "templado/mappers": "^1.0"
 }
 ```
