@@ -911,8 +911,7 @@ Now that we have a \DOMNode, we can easily create a Templado Snippet.
 $snippet = new \Templado\Engine\SimpleSnippet('header', $element);
 ```
 
-Notice that the first parameter is the target id. The second parameter is of course the element to be added.
-And now we can put it all together like this:
+Notice that the first parameter is the target id (from our template). The second parameter is of course the element to be added.
 
 The method to apply Snippets to a Templado Html object expects a \Templado\Engine\SnippetListCollection. Even though we 
 are adding only one Snippet in this example, we will still need to instantiate the Collection, and add our Snippet:
@@ -970,7 +969,7 @@ Our Snippet gets applied, and the final rendered page in our example looks like 
 ```
 
 Of course, in most cases you are are not going to want to add single simple elements one by one. You can easily create more 
-complex Snippets by loading a partial HTML string into your DOMDocument, and then extracting the element(s) that you want:
+complex Snippets by loading a partial HTML string into your DOMDocument, and then extracting the root element that you want:
 
 ```
 $codeSample = new \DOMDocument();
@@ -1003,15 +1002,15 @@ rendered page looks like this:
 </html>
 ```
 
-In this example we used a single element (with children) as our Snippet. And in this case, since the id of the Snippet element 
+In this example we used a single element (with children) as our Snippet. And since the id of the Snippet element 
 matched the id of the template element, the template element was replaced.
 
 **Note:** If Templado does not find an element matching our target id, our Snippet is ignored. 
 
-Instead of replacing the template element, you want to append multiple children to it. In this case you could, of course, create 
-each of the child elements as individual Snippets and add them all, but this would be quite tedious. If you wanted to group 
-them as one Snippet there would be an issue because they would not a have common root element. Your partial code would be 
-invalid. For this case we can use \Templado\Engine\TempladoSnippet. 
+If instead of replacing the template element, you want to append multiple children to it. You could, of course, create 
+each of the child elements as individual Snippets and add them all to the Collection, but this would be quite tedious. 
+If you wanted to group them as one Snippet there would be an issue because they would not a have common root element. 
+Your partial code would be invalid. For this case, we can use \Templado\Engine\TempladoSnippet. 
 
 We can take a partial HTML string, and simply wrap it in a Templado namespace. 
 
