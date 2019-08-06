@@ -897,20 +897,34 @@ Say we have the following template code:
 </html>
 ```   
 
-Now you want to add a page title to the existing header div. So you create a simple code snippet:
+Now you want to add a page title to the existing header div. You do this by first creating a \DOMNode. There are various 
+ways to accomplish this. One straight forward way is with \DOMDocument::createElement:
 
 ```html
-<h1>This Is A Simple Snippet Example</h1>
+$codeBlock = new \DOMDocument();
+$header = $codeBlock->createElement('h1', 'This Is A Simple Snippet Example');
 ```
 
-In order to temporarily make our partial code into valid XML we must first wrap it in a Templado namespace.
-The namespace looks like this:
+Now that we have a \DOMNode, we can easily create a Templado Snippet.
+
 ```
-<page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
-    
-</page:snippet>
+$snippet = new \Templado\Engine\SimpleSnippet('header', $element);
 ```
-But once we wrap our partial code, we can use Templado Snippets to put it all together like this:
+
+Notice that the first parameter is the target id. The second parameter is of course the element to be added.
+And now we can put it all together like this:
+
+The method to apply Snippets to a Templado Html object expects a \Templado\Engine\SnippetListCollection. Even though we 
+are adding only one Snippet in this example, we will still need to instantiate the Collection, and add our Snippet:
+
+```
+$snippetListCollection = new SnippetListCollection();
+...
+$snippetListCollection->addSnippet($snippet);
+```
+
+If we had multiple Snippets to apply, we could simply add them to the Collection. But for this example we can just go ahead 
+and apply this one using the \Templado\Engine\Html::applySnippets method. We put it all together like so:
 
 ```php
 try {
@@ -919,16 +933,10 @@ try {
     );
 
     $snippetListCollection = new SnippetListCollection();
-    
-    $partialCodeString = 
-        '<page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
-            <h1>This Is A Simple Snippet Example</h1>
-        </page:snippet>';
         
-    $codeSample = new \DOMDocument();
-    $codeSample->loadXML($partialCodeString);
-    
-    $snippet = new TempladoSnippet('header', $codeSample);
+    $codeBlock = new \DOMDocument();
+    $element = $codeBlock->createElement('h1', 'This Is A Simple Snippet Example');
+    $snippet = new SimpleSnippet('header', $element);
 
     $snippetListCollection->addSnippet($snippet);
     
@@ -943,24 +951,7 @@ try {
 }
 ```
 
-Let's walk through this code. First, just as with our simple examples from before, we instantiate a Templado\Engine\Html 
-object using the static "loadHtmlFile" method.
-
-Next we initialize a SnippetListCollection. *The "applySnippets" method that we use further down expects this collection 
-as its only parameter. So even if we are only adding one Snippet, it is still necessary to create the collection.* 
-
-We create our wrapped partial code string, using the Templado namespace, and then we turn our code fragment into a DOMNode. 
-There are obviously many different DOMNode objects, and ways to create them. In this example we use a DOMDocument. 
-This is accomplished by creating a new PHP DOMDocument, and using the "loadXML" method. 
-
-Once we have a DOMNode, we can instantiate a new Templado\Engine\TempladoSnippet, which has two construction parameters. 
-The first parameter is the target id. In our example we reference the "header" div. The second parameter is the partial 
-code (DOMNode), which will be appended to the element of the target id (**if it exists**). 
-
-Now we simply add the Snippet to our Collection, and call the "applySnippets" method to complete the process. 
-
-
-The final rendered page in our example looks like this:
+Our Snippet gets applied, and the final rendered page in our example looks like this:
 
 ```html
 <?xml version="1.0" ?>
@@ -978,51 +969,22 @@ The final rendered page in our example looks like this:
 </html>
 ```
 
-**Note:** If Templado does not find an element matching our target id, our Snippet is ignored. If an element that matches our target 
-id exists in our template, but is also the same kind of tag as the root of our Snippet (i.e in this case, instead of a div, 
-it were a header tag), then the Snippet is appended to the document after the target id element.
+Of course, in most cases you are are not going to want to add single simple elements one by one. You can easily create more 
+complex Snippets by loading a partial HTML string into your DOMDocument, and then extracting the element(s) that you want:
 
-**Note (to Note):** If you add an "id" attribute to the Templado namespace, then the above stated actions are different. 
-If a tag is found that matches both the target id given in the Templado namespace, AND the root tag type of your Snippet, 
-then the tag in the template is replaced (rather than the Snippet being appended after)!  
+```
+$codeSample = new \DOMDocument();
 
-This is an extremely over-simplified example. In reality, if this is all that you wanted to do, it would be easier, and 
-cleaner to just write out the template code, and use property attributes. But this gives you an idea of what Snippets 
-can do.
+$htmlString = '<div id="header"><h1>This is a more <span class="red">complex header</span><p>Click <a href="some-link">HERE</a></p></div>';
 
-Let's go a little deeper. 
+$codeSample->loadHTML($htmlString);
 
-We can nest our Snippets. By doing so, you start to see the power behind them. If we simply add an id to our first Snippet, 
-then we can add a second Snippet the references it. So we update our original fragment:
-
-```php
-...
-
-$codeSample->loadXML('<h1 id="main-title">This Is A Simple Snippet Example</h1>');
+$element = $codeSample->getElementById('header');
 ``` 
 
-And add our second Snippet:
-
-```
-... 
-
-$snippetListCollection->addSnippet(
-    new SimpleSnippet('main-title', new \DOMText(' And Then Some'))
-);
-```
-
-Notice here that, since we are just appending text to the now existing header element, we simply instantiate a DOMText 
-object with our addition text, create the SimpleSnippet, and add it to the collection. 
-
-And of course, we apply the SnippetListCollection
-
-```php
-...
-
-$page->applySnippets($snippetListCollection);
-```
-
-Now our final output will look like this:
+As long as your HTML string is valid, this method will work! The rest of the process would be the same. Simply create a 
+SimpleSnippet from our (more complex) DOMElement, add it to a SnippetListCollection, and apply it to the Page. And now our 
+rendered page looks like this:
 
 ```html
 <?xml version="1.0" ?>
@@ -1034,13 +996,51 @@ Now our final output will look like this:
     </head>
     <body>
         <div id="header">
-            <h1 id="main-title">This Is A Simple Snippet Example And Then Some</h1>
+            <h1>This is a more <span class="red">complex header</span>
+            <p>Click <a href="some-link">HERE</a></p>
         </div>
     </body>
 </html>
 ```
 
-This is powerful, but let's get to the real point here. Snippets are way to combine, nest and modify code blocks. But 
+In this example we used a single element (with children) as our Snippet. And in this case, since the id of the Snippet element 
+matched the id of the template element, the template element was replaced.
+
+**Note:** If Templado does not find an element matching our target id, our Snippet is ignored. 
+
+Instead of replacing the template element, you want to append multiple children to it. In this case you could, of course, create 
+each of the child elements as individual Snippets and add them all, but this would be quite tedious. If you wanted to group 
+them as one Snippet there would be an issue because they would not a have common root element. Your partial code would be 
+invalid. For this case we can use \Templado\Engine\TempladoSnippet. 
+
+We can take a partial HTML string, and simply wrap it in a Templado namespace. 
+
+So this string: 
+
+```
+$partialHtmlString = '<h1>This is a more <span class="red">complex header</span><p>Click <a href="some-link">HERE</a></p>';
+```
+Becomes:
+
+```
+$partialHtmlString = 
+        '<page:snippet xmlns:page="https://templado.io/snippets/1.0" xmlns="http://www.w3.org/1999/xhtml">
+            <h1>This is a more <span class="red">complex header</span><p>Click <a href="some-link">HERE</a></p>
+        </page:snippet>';
+```
+
+Then we load our (now valid) XML into our DOMDocument. 
+
+```
+$codeSample = new \DOMDocument();
+$codeSample->loadXML($partialHtmlString);
+    
+$snippet = new TempladoSnippet('header', $codeSample);
+```
+
+And again, the rest of the process is the same. We add it to a SnippetListCollection, and apply it to our page. 
+
+This is powerful, but let's get to the real point here. Snippets are way to combine, nest and modify blocks of code. But 
 notice that we are still working with the same base object - the Templado\Engine\Html object. And therefore, we can still 
 apply View Models to it. 
 
