@@ -1,4 +1,5 @@
 # Templado Documentation
+
 A pragmatic approach to templating for PHP 7.2+
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/templado/engine/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/templado/engine/?branch=master)
@@ -527,7 +528,7 @@ have a property called "user" that you want to reference multiple times. You can
 the "property" attribute to accomplish this:
 
 ```html
-<div prefix="u user">
+<div prefix="u: user">
     <p>Name: <span property="u:name">Original Name</span></p>
 </div>
 <div>
@@ -540,8 +541,8 @@ the "property" attribute to accomplish this:
 </div>
 ```
 
-In our prefix attribute we used the letter "u" (*short for user, obviously*) followed by a space, and then the property 
-that we want to reference (*in this case "user"*).
+In our prefix attribute we used the letter "u" (*short for user, obviously*) followed by a colon and a space, then 
+the property that we want to reference (*in this case "user"*).
 
 Now, since we have created an alias for the user property, notice that we must use the colon notation to reference its 
 methods/properties. (*"u:" followed by the method name*)
