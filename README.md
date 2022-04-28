@@ -183,7 +183,7 @@ class Headline {
     }
     
     public function asString() {
-        reuturn "The Actual Title";
+        return "The Actual Title";
     }
 }
 ```
@@ -235,7 +235,7 @@ class Headline {
     }
     
     public function asString() {
-        reuturn "The Actual Title";
+        return "The Actual Title";
     }
 }
 ```
