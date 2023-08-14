@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Arne Blankerts <arne@blankerts.de> and contributors" /><link rel="canonical" href="https://docs.templado.io/concept/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Index - Templado Documentation</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link href="../highlight/github.min.css" rel="stylesheet" />
+        <link href="../css/templado.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Index";
+        var mkdocs_page_input_path = "concept/index.md";
+        var mkdocs_page_url = "/concept/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]--> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="..">
+          <img src="../img/templado-logo.svg" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../install/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../start/">First Steps</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Concepts</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="viewmodel/">View Models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="transformation/">Transformation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="forms/">Form Handling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="filter/">Filtering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="merge/">Merging</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Reference</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/document/">Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/viewmodels/">View Models</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/transformations/">Transformations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/filter/">Filters</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/serializer/">Serialization</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../use/merge/">Merging</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">Templado Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li class="breadcrumb-item active">Index</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/templado/documentation/blob/main/src/concept/index.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h3 id="motivation">Motivation</h3>
+<p>Most of today's templating engines mix code for the required rendering logic with HTML markup in one file and require
+the developers to learn their respective language.</p>
+<p>Templado follows a different approach on templating: Being in part inspired by <a href="https://github.com/watoki/tempan">Tempan</a>,
+Templado relies solely on plain HTML markup. The limited amount of display logic required is contained with the engine
+and triggered by the view model when it's applied to the Page.</p>
+<h3 id="always-ready-to-preview">Always ready to preview</h3>
+<p>As a Templado template is plain HTML, previewing is as easy as opening the HTML file with a browser - example data can
+and should be included as the engine will clean it up based on the view model upon rendering.</p>
+<h3 id="no-markup-duplication">No markup duplication</h3>
+<p>Templado features asset support, mapping a list of assets based on their ID into a given HTML Page. To automate this
+process <a href="https://github.com/theseer/templado-cli">Templado CLI</a> can be used. Combined with a File watcher in your IDE,
+you can have an always up-to-date set of HTML pages without ever writing a block twice.</p>
+<h3 id="form-handling-included">Form handling included</h3>
+<p>To make form handling even more easy, Templado comes with explicit HTML Form support. Based on supplied Input data,
+Templado will repopulate the HTML form and even include your CSRF protection code.</p>
+<h3 id="custom-transformations-and-filters">Custom transformations and Filters</h3>
+<p>Templado allows for custom transformations, like adding a class to every <code>a</code> tag and string based replacements upon
+serialization.</p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023, Arne Blankerts and contributors</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/templado/documentation" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../highlight/highlight.min.js"></script>
+      <script src="../highlight/all.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
