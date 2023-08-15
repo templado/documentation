@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Arne Blankerts <arne@blankerts.de> and contributors" /><link rel="canonical" href="https://docs.templado.io/start/install/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Installation - Templado Documentation</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link href="../../highlight/github.min.css" rel="stylesheet" />
+        <link href="../../css/templado.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Installation";
+        var mkdocs_page_input_path = "start/install.md";
+        var mkdocs_page_url = "/start/install/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]--> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../..">
+          <img src="../../img/templado-logo.svg" class="logo" alt="Logo"/>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption"><span class="caption-text">Getting Started</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Installation</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#runtime-requirements">Runtime Requirements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#install-with-composer">Install with Composer</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../start/">First Steps</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Features</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/viewmodel/">View Model Rendering</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/forms/">Form Handling</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/merge/">Merging Documents</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/transformation/">Applying Transformations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/serializing/">Controlling the Serializing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/filter/">Filtering</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Extending Templado</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../extend/transformations/">Creating Transformations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../extend/filter/">Creating Filters</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../extend/selectors/">Creating Selectors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../extend/serializer/">Custom Serialization</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Migration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../migrate/templado4/">Templado 4.x</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Resources</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://templado.io">Project Homepage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/templado/engine">Source Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/templado/engine/issues">Issue Tracker</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">Templado Documentation</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Getting Started &raquo;</li>
+      <li class="breadcrumb-item active">Installation</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/templado/documentation/blob/main/src/start/install.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h2 id="installation">Installation</h2>
+<h3 id="runtime-requirements">Runtime Requirements</h3>
+<p>Templado merely requires an up-to-date PHP Version with XML and DOM support.
+So this boils down to the following:  </p>
+<ul>
+<li>PHP &gt;= 8.2.0</li>
+<li>Extensions<ul>
+<li>dom</li>
+<li>libxml</li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please note that when you want to contribute to the development of Templado or if you just want to run the tests or some of the tools used during development of Templado like infection or psalm, additional extensions are required. As this is not a runtime requirement, those are not listed here.</p>
+</div>
+<h3 id="install-with-composer">Install with Composer</h3>
+<p>Templado is designed to be installed as a library using <a href="https://getcomposer.org">Composer</a>, the defacto standard to install and manage runtime dependencies for PHP.</p>
+<p>The easiest way to add Templado to your project is from the CLI:</p>
+<pre><code class="language-shell">$ composer require templado/engine:^5.0
+</code></pre>
+<p>If you prefer to manually create or edit the <code>composer.json</code> file, please add the following fragment to it.</p>
+<pre><code class="language-json">&quot;require&quot; : {
+    &quot;templado/engine&quot;: &quot;^5.0&quot;
+}
+</code></pre>
+<p>For Templado, and its dependencies, to be actually installed after manually editing, you'd have to explicitly run <code>composer install</code>.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../start/" class="btn btn-neutral float-right" title="First Steps">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+      <p>Copyright &copy; 2023, Arne Blankerts and contributors</p>
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/templado/documentation" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+      <span><a href="../start/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../highlight/highlight.min.js"></script>
+      <script src="../../highlight/all.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

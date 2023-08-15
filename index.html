@@ -13,7 +13,7 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Templado 5 Documentation";
+        var mkdocs_page_name = "Templado Documentation";
         var mkdocs_page_input_path = "index.md";
         var mkdocs_page_url = "/";
       </script>
@@ -41,37 +41,49 @@
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">Getting Started</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="install/">Installation</a>
+                  <li class="toctree-l1"><a class="reference internal" href="start/install/">Installation</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="start/">First Steps</a>
-                  </li>
-              </ul>
-              <p class="caption"><span class="caption-text">Concepts</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="concept/viewmodel/">View Models</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="concept/transformation/">Transformation</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="concept/forms/">Form Handling</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="concept/filter/">Filtering</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="concept/merge/">Merging</a>
+                  <li class="toctree-l1"><a class="reference internal" href="start/start/">First Steps</a>
                   </li>
               </ul>
-              <p class="caption"><span class="caption-text">Reference</span></p>
+              <p class="caption"><span class="caption-text">Features</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="use/document/">Documents</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/viewmodel/">View Model Rendering</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="use/viewmodels/">View Models</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/forms/">Form Handling</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="use/transformations/">Transformations</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/merge/">Merging Documents</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="use/filter/">Filters</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/transformation/">Applying Transformations</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="use/serializer/">Serialization</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/serializing/">Controlling the Serializing</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="use/merge/">Merging</a>
+                  <li class="toctree-l1"><a class="reference internal" href="features/filter/">Filtering</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Extending Templado</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="extend/transformations/">Creating Transformations</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extend/filter/">Creating Filters</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extend/selectors/">Creating Selectors</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="extend/serializer/">Custom Serialization</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Migration</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="migrate/templado4/">Templado 4.x</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Resources</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="" href="https://templado.io">Project Homepage</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/templado/engine">Source Code</a>
+                  </li>
+                  <li class="toctree-l1"><a class="" href="https://github.com/templado/engine/issues">Issue Tracker</a>
                   </li>
               </ul>
       </div>
@@ -88,7 +100,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-      <li class="breadcrumb-item active">Templado 5 Documentation</li>
+      <li class="breadcrumb-item active">Templado Documentation</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/templado/documentation/blob/main/src/index.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
@@ -98,7 +110,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="templado-5-documentation">Templado 5 Documentation</h1>
+                <h1 id="templado-documentation">Templado Documentation</h1>
+<p>Last Updated: 2023-08-15</p>
+<p>Most of today's templating engines mix code for the required rendering logic with HTML markup in one file and require developers to learn their respective language as well as syntax.</p>
+<blockquote>
+<h3 id="finally-a-template-engine-that-does-not-require-learning-a-new-language-or-syntax">»Finally a template engine that does not require learning a new language or syntax.«</h3>
+</blockquote>
+<p>Templado follows a different approach on templating: Being in part inspired by <a href="https://github.com/watoki/tempan">Tempan</a>, Templado's main feature - the template rendering - relies solely on plain and standard HTML markup with a subset of RDFa annotations. The limited amount of display logic required is contained within the engine and triggered by the view model or form when being applied to the document. </p>
+<p>Templado is Open Source, licensed under the <a href="https://github.com/templado/engine/blob/main/LICENSE">BSD 3-Clause License</a>.</p>
+<hr />
+<p><center>
+<a href="https://github.com/templado/engine/actions"><img alt="Github Actions" src="https://github.com/templado/engine/workflows/Integrate/badge.svg" /></a>
+<a href="https://codecov.io/gh/templado/engine"><img alt="Test Coverage" src="https://codecov.io/gh/templado/engine/branch/main/graph/badge.svg?token=8YAY4WAQO8" /></a>
+<img alt="Packagist Downloads (custom server)" src="https://img.shields.io/packagist/dt/templado/engine" />
+<a href="https://github.com/templado/engine/issues"><img alt="Issues" src="https://img.shields.io/github/issues/templado/engine.svg" /></a>
+</center></p>
+<hr />
+<p><center></p>
+<h3 id="this-documentation-covers-templado-50please-follow-this-link-for-documentation-on-templado-4x">This documentation covers Templado 5.0<br/>Please follow this link for <a href="https://github.com/templado/documentation/blob/4.x/README.md">documentation on Templado 4.x</a></h3>
+<p></center></p>
               
             </div>
           </div><footer>
@@ -149,5 +179,5 @@
 
 <!--
 MkDocs version : 1.5.2
-Build Date UTC : 2023-08-14 22:12:48.005352+00:00
+Build Date UTC : 2023-08-15 14:57:55.796831+00:00
 -->

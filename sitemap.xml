@@ -2,77 +2,77 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.templado.io/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/install/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/extend/filter/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/start/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/extend/selectors/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/extend/serializer/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/filter/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/extend/transformations/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/forms/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/merge/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/filter/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/transformation/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/forms/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/concept/viewmodel/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/merge/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/document/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/serializing/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/filter/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/transformation/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/merge/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/features/viewmodel/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/serializer/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/migrate/templado4/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/transformations/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/start/install/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>https://docs.templado.io/use/viewmodels/</loc>
-         <lastmod>2023-08-14</lastmod>
+         <loc>https://docs.templado.io/start/start/</loc>
+         <lastmod>2023-08-15</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
