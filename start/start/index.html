@@ -45,9 +45,11 @@
                   </li>
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">First Steps</a>
     <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#load-the-template-markup">Load the Template Markup</a>
+    <li class="toctree-l2"><a class="reference internal" href="#1-loading-the-template">1. Loading the Template</a>
     </li>
-    <li class="toctree-l2"><a class="reference internal" href="#applying-a-view-model">Applying a View Model</a>
+    <li class="toctree-l2"><a class="reference internal" href="#2-applying-a-view-model">2. Applying a View Model</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-serializing-back-to-html">3. Serializing back to HTML</a>
     </li>
     </ul>
                   </li>
@@ -119,11 +121,12 @@
               
                 <h2 id="getting-started">Getting Started</h2>
 <p>As with any templating engine, the main goal is to pair a template with a data source. Templado uses View Models and HTML templates to accomplish this. So the first thing we need to do is introduce them to each other.</p>
-<h3 id="load-the-template-markup">Load the Template Markup</h3>
-<p>For Templado to operate, an instance of <code>Document</code> needs to be created. This can be done either from a string - which will then be parsed internally into a <code>DOMDocument</code> or by supplying an already created instance of PHP's <code>DOMDocument</code>.</p>
+<h3 id="1-loading-the-template">1. Loading the Template</h3>
+<p>For Templado to operate, we need a Template to work with. From Templado's point of view, every Template is a <code>Document</code>. This can either be a complete HTML page - or just a fragment or snippet. </p>
+<p>A Templado <code>Document</code> can be instantiated either from a string or by supplying an already created instance of PHP's <code>DOMDocument</code>. For our first steps, we'll be using a String:</p>
 <pre><code class="language-php">$document = Templado\Engine\Document::fromString('
     &lt;!DOCTYPE html&gt;
-    &lt;html lang=&quot;en&quot; &gt;
+    &lt;html lang=&quot;en&quot;&gt;
         &lt;head&gt;
             &lt;title&gt;Hello World, Templado!&lt;/title&gt;
         &lt;/head&gt;
@@ -131,26 +134,41 @@
             &lt;h1 property=&quot;headline&quot;&gt;My First Template&lt;/h1&gt;
         &lt;/body&gt;
     &lt;/html&gt;
-'); 
+');
 </code></pre>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>As Templado uses PHP's DOMDocument, the markup must be a valid XML string. HTML 5 can be written using the HTML or XML serialization format. LibXML, the underlying engine that powers PHP's DOM support, does not support the HTML serialization format of HTML 5. Templado does, nevertheless, produce valid HTML 5 using its own HTMLSerializer.  </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While HTML can be represented using either the HTML or the XML serialization format, LibXML 2.x - the underlying engine that powers most of PHP's DOM support - does only support the HTML serialization format up to version 4. For that reason, and to avoid other quirks, Templado uses the XML mode when parsing a string. If you do not want this, feel free to create a <code>DOMDocument</code> by other means and pass that to Templado using the alternative factory method <code>Templado\Engine\Document::fromDomDocument</code>.</p>
 </div>
-<h3 id="applying-a-view-model">Applying a View Model</h3>
-<p>Once the <code>Document</code> is available, a View Model can be applied. The above basic HTML example contains a single <code>property</code> attribute, which Templado uses as the method name to fetch an alternative Text body.</p>
-<p>A basic view Model could look and be applied like this:</p>
+<h3 id="2-applying-a-view-model">2. Applying a View Model</h3>
+<p>Once a <code>Document</code> instance is available, a View Model can be applied. Templado relies on <a href="https://www.w3.org/TR/html-rdfa/">RDFa</a> attributes embedded into the HTML to determine which methods to call on the current view model. More details on this, supported attributes and their respective meaning for Templado as well as more complex constructs can be found in the <a href="../../features/viewmodel/">View Models</a> section. </p>
+<p>The above basic HTML example contains a single RDFa attribute <code>property</code>. Templado uses this attribute, or rather the value of it, as the method name to call on the current view model and to determine what to do.</p>
+<p>The application of a very basic view Model to change text of the <code>&lt;h1&gt;</code> element could look like this:</p>
 <pre><code class="language-php">$document-&gt;applyViewModel(new class {
     public function headline(): string {
         return 'Hello world!';
     }
 });
-
-print $document-&gt;asString(
+</code></pre>
+<p>The <code>property</code>'s value is "headline", thus Templado is going to call the method named "headline" on the view model. Given the returned type is a <code>string</code>, the element's text content will be changed.</p>
+<h3 id="3-serializing-back-to-html">3. Serializing back to HTML</h3>
+<p>Given the above sample model, Templado will replace the original text ('My First Template') with 'Hello world!'. To verify our success, we can have Templado serialize the Document back to HTML for us. We'll do so by using Templado's HTML Serializer. More on the serializer support can be found in the <a href="../../features/serializing/">Serializer</a> section. The HTML Serializer used here will ensure we produce sane HTML 5 output, despite the fact we use the XML mode internally:</p>
+<pre><code class="language-php">print $document-&gt;asString(
     new Templado\Engine\HTMLSerializer()
 );
-
 </code></pre>
+<p>The above should produce this output:</p>
+<pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;title&gt;Hello World, Templado!&lt;/title&gt;
+    &lt;/head&gt;
+    &lt;body&gt;
+        &lt;h1 property=&quot;headline&quot;&gt;Hello world!&lt;/h1&gt;
+    &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p><strong>Congratulations, you just rendered your first HTML page using Templado!</strong></p>
               
             </div>
           </div><footer>
