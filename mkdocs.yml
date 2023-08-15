@@ -24,6 +24,8 @@ nav:
       - Filters: use/filter.md
       - Serialization: use/serializer.md
       - Merging: use/merge.md
+not_in_nav: |
+  *index.md
 theme:
   name: readthedocs
   highlightjs: false
