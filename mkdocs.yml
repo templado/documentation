@@ -9,21 +9,26 @@ docs_dir: src
 site_dir: build/public
 nav:
   - Getting Started:
-    - Installation: install.md
-    - First Steps: start.md
-  - Concepts:
-      - View Models: concept/viewmodel.md
-      - Transformation: concept/transformation.md
-      - Form Handling: concept/forms.md
-      - Filtering: concept/filter.md
-      - Merging: concept/merge.md
-  - Reference:
-      - Documents: use/document.md
-      - View Models: use/viewmodels.md
-      - Transformations: use/transformations.md
-      - Filters: use/filter.md
-      - Serialization: use/serializer.md
-      - Merging: use/merge.md
+    - Installation: start/install.md
+    - First Steps: start/start.md
+  - Features:
+      - View Model Rendering: features/viewmodel.md
+      - Form Handling: features/forms.md
+      - Merging Documents: features/merge.md
+      - Applying Transformations: features/transformation.md
+      - Controlling the Serializing: features/serializing.md
+      - Filtering: features/filter.md
+  - Extending Templado:
+      - Creating Transformations: extend/transformations.md
+      - Creating Filters: extend/filter.md
+      - Creating Selectors: extend/selectors.md
+      - Custom Serialization: extend/serializer.md
+  - Migration:
+      - Templado 4.x: migrate/templado4.md
+  - Resources:
+      - Project Homepage: https://templado.io
+      - Source Code: https://github.com/templado/engine
+      - Issue Tracker: https://github.com/templado/engine/issues
 not_in_nav: |
   *index.md
 theme:
@@ -36,4 +41,9 @@ extra_css:
 extra_javascript:
   - highlight/highlight.min.js
   - highlight/all.js
-
+markdown_extensions:
+  - callouts
+  - tables
+plugins:
+  - search
+  - macros

@@ -1,10 +1,15 @@
 # Templado Documentation
 
-> ### »Finally a template engine that does not require learning a new language or syntax.« 
+Last Updated: {{ page.update_date }}
 
 Most of today's templating engines mix code for the required rendering logic with HTML markup in one file and require developers to learn their respective language as well as syntax.
 
+> ### »Finally a template engine that does not require learning a new language or syntax.«
+
 Templado follows a different approach on templating: Being in part inspired by [Tempan](https://github.com/watoki/tempan), Templado's main feature - the template rendering - relies solely on plain and standard HTML markup with a subset of RDFa annotations. The limited amount of display logic required is contained within the engine and triggered by the view model or form when being applied to the document. 
+
+Templado is Open Source, licensed under the [BSD 3-Clause License](https://github.com/templado/engine/blob/main/LICENSE).
+
 
 ---
 <center>
@@ -18,4 +23,5 @@ Templado follows a different approach on templating: Being in part inspired by [
 <center>
 ### This documentation covers Templado 5.0<br/>Please follow this link for [documentation on Templado 4.x](https://github.com/templado/documentation/blob/4.x/README.md)
 </center>
+
 

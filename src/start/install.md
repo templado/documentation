@@ -10,9 +10,9 @@ So this boils down to the following:
     - dom
     - libxml
 
-Please note that when you want to contribute to the development of Templado or if you just want to run the tests or some of the tools used during development of Templado like infection or psalm, additional extensions are required. As this is not a runtime requirement, those are not listed here.
+NOTE: Please note that when you want to contribute to the development of Templado or if you just want to run the tests or some of the tools used during development of Templado like infection or psalm, additional extensions are required. As this is not a runtime requirement, those are not listed here.
 
-### Composer
+### Install with Composer
 
 Templado is designed to be installed as a library using [Composer](https://getcomposer.org), the defacto standard to install and manage runtime dependencies for PHP.
 
@@ -30,4 +30,4 @@ If you prefer to manually create or edit the `composer.json` file, please add th
 }
 ```
 
-For Templado, and it's dependencies, to be actually installed after manually editing, you'd have to explicitly run `composer install`.
+For Templado, and its dependencies, to be actually installed after manually editing, you'd have to explicitly run `composer install`.
