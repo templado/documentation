@@ -9,20 +9,19 @@ docs_dir: src
 site_dir: build/public
 nav:
   - Getting Started:
-    - Installation: start/install.md
-    - First Steps: start/start.md
+    - Installation: install.md
+    - First Steps: first-steps.md
   - Features:
-      - View Model Rendering: features/viewmodel.md
-      - Form Handling: features/forms.md
+      - View Model Rendering: features/view-model.md
+      - Form Handling: features/form-handling.md
       - Merging Documents: features/merge.md
       - Applying Transformations: features/transformation.md
       - Controlling the Serializing: features/serializing.md
-      - Filtering: features/filter.md
   - Extending Templado:
       - Creating Transformations: extend/transformations.md
-      - Creating Filters: extend/filter.md
+      - Creating Filters: extend/filters.md
       - Creating Selectors: extend/selectors.md
-      - Custom Serialization: extend/serializer.md
+      - Custom Serialization: extend/serializers.md
   - Migration:
       - Templado 4.x: migrate/templado4.md
   - Resources:

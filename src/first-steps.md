@@ -26,7 +26,7 @@ NOTE: While HTML can be represented using either the HTML or the XML serializati
 
 ### 2. Applying a View Model
 
-Once a `Document` instance is available, a View Model can be applied. Templado relies on [RDFa](https://www.w3.org/TR/html-rdfa/) attributes embedded into the HTML to determine which methods to call on the current view model. More details on this, supported attributes and their respective meaning for Templado as well as more complex constructs can be found in the [View Models](../features/viewmodel.md) section. 
+Once a `Document` instance is available, a View Model can be applied. Templado relies on [RDFa](https://www.w3.org/TR/html-rdfa/) attributes embedded into the HTML to determine which methods to call on the current view model. More details on this, supported attributes and their respective meaning for Templado as well as more complex constructs can be found in the [View Models](features/view-model.md) section. 
 
 The above basic HTML example contains a single RDFa attribute `property`. Templado uses this attribute, or rather the value of it, as the method name to call on the current view model and to determine what to do.
 
@@ -44,7 +44,7 @@ The `property`'s value is "headline", thus Templado is going to call the method 
 
 ### 3. Serializing back to HTML
 
-Given the above sample model, Templado will replace the original text ('My First Template') with 'Hello world!'. To verify our success, we can have Templado serialize the Document back to HTML for us. We'll do so by using Templado's HTML Serializer. More on the serializer support can be found in the [Serializer](../features/serializing.md) section. The HTML Serializer used here will ensure we produce sane HTML 5 output, despite the fact we use the XML mode internally:
+Given the above sample model, Templado will replace the original text ('My First Template') with 'Hello world!'. To verify our success, we can have Templado serialize the Document back to HTML for us. We'll do so by using Templado's HTML Serializer. More on the serializer support can be found in the [Serializer](features/serializing.md) section. The HTML Serializer used here will ensure we produce sane HTML 5 output, despite the fact we use the XML mode internally:
 
 ```php
 print $document->asString(
