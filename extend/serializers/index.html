@@ -3,9 +3,9 @@
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Arne Blankerts <arne@blankerts.de> and contributors" /><link rel="canonical" href="https://docs.templado.io/features/viewmodel/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="author" content="Arne Blankerts <arne@blankerts.de> and contributors" /><link rel="canonical" href="https://docs.templado.io/extend/serializers/" />
       <link rel="shortcut icon" href="../../img/favicon.ico" />
-    <title>View Model Rendering - Templado Documentation</title>
+    <title>Custom Serialization - Templado Documentation</title>
     <link rel="stylesheet" href="../../css/theme.css" />
     <link rel="stylesheet" href="../../css/theme_extra.css" />
         <link href="../../highlight/github.min.css" rel="stylesheet" />
@@ -13,9 +13,9 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "View Model Rendering";
-        var mkdocs_page_input_path = "features/viewmodel.md";
-        var mkdocs_page_url = "/features/viewmodel/";
+        var mkdocs_page_name = "Custom Serialization";
+        var mkdocs_page_input_path = "extend/serializers.md";
+        var mkdocs_page_url = "/extend/serializers/";
       </script>
     
     <!--[if lt IE 9]>
@@ -41,35 +41,33 @@
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption"><span class="caption-text">Getting Started</span></p>
               <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../start/install/">Installation</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../install/">Installation</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../start/start/">First Steps</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../first-steps/">First Steps</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Features</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">View Model Rendering</a>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/view-model/">View Model Rendering</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../forms/">Form Handling</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/form-handling/">Form Handling</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../merge/">Merging Documents</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/merge/">Merging Documents</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../transformation/">Applying Transformations</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/transformation/">Applying Transformations</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../serializing/">Controlling the Serializing</a>
-                  </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../filter/">Filtering</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../../features/serializing/">Controlling the Serializing</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Extending Templado</span></p>
-              <ul>
-                  <li class="toctree-l1"><a class="reference internal" href="../../extend/transformations/">Creating Transformations</a>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../transformations/">Creating Transformations</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../extend/filter/">Creating Filters</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../filters/">Creating Filters</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../extend/selectors/">Creating Selectors</a>
+                  <li class="toctree-l1"><a class="reference internal" href="../selectors/">Creating Selectors</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../../extend/serializer/">Custom Serialization</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Custom Serialization</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Migration</span></p>
@@ -100,10 +98,10 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="../.." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-          <li>Features &raquo;</li>
-      <li class="breadcrumb-item active">View Model Rendering</li>
+          <li>Extending Templado &raquo;</li>
+      <li class="breadcrumb-item active">Custom Serialization</li>
     <li class="wy-breadcrumbs-aside">
-          <a href="https://github.com/templado/documentation/blob/main/src/features/viewmodel.md" class="icon icon-github"> Edit on GitHub</a>
+          <a href="https://github.com/templado/documentation/blob/main/src/extend/serializers.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
@@ -116,8 +114,8 @@
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../../start/start/" class="btn btn-neutral float-left" title="First Steps"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../forms/" class="btn btn-neutral float-right" title="Form Handling">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../selectors/" class="btn btn-neutral float-left" title="Creating Selectors"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../../migrate/templado4/" class="btn btn-neutral float-right" title="Templado 4.x">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -145,10 +143,10 @@
         </span>
     
     
-      <span><a href="../../start/start/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../selectors/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../forms/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../../migrate/templado4/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>
