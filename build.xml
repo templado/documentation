@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Templado Documentation" default="serve" basedir=".">
+    <property name="source" value="src"/>
+    <property name="venv" value="${basedir}/.mkdocs" />
+    <property name="mkdocs" value="${venv}/bin/mkdocs" />
+
+
+    <target name="clean" description="Clean up and create artifact directories">
+        <delete dir="${basedir}/build/public"/>
+    </target>
+
+    <target name="publish">
+        <exec executable="${mkdocs}" >
+            <env key="VIRTUAL_ENV" value="${venv}" />
+            <arg line="gh-deploy --force --strict --clean --verbose" />
+        </exec>
+    </target>
+
+    <target name="serve">
+        <exec executable="${mkdocs}" >
+            <env key="VIRTUAL_ENV" value="${venv}" />
+            <arg line="serve --dirty" />
+        </exec>
+    </target>
+
+    <target name="render">
+        <exec executable="${mkdocs}" >
+            <env key="VIRTUAL_ENV" value="${venv}" />
+            <arg line="build --verbose --strict" />
+        </exec>
+    </target>
+
+    <target name="build" depends="clean,render" />
+
+</project>
