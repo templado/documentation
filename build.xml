@@ -4,7 +4,6 @@
     <property name="venv" value="${basedir}/.mkdocs" />
     <property name="mkdocs" value="${venv}/bin/mkdocs" />
 
-
     <target name="clean" description="Clean up and create artifact directories">
         <delete dir="${basedir}/build/public"/>
     </target>

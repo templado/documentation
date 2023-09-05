@@ -8,7 +8,7 @@ While details of course differ, interestingly enough, most engines seem to agree
 
 These approaches have a tendency to become a mess quickly, being hard to test and to reason about. Wouldn't it be much nicer to have standard HTML files, ready to preview at any time and otherwise controlling the rendering process from outside the template?
 
-#### RDFa
+#### Using RDFa
 
 Instead of mixing view logic with markup by embedding instructions into the HTML for a clean separation of concerns, we'd want the logic part to be outside the markup. Yet, for a templating engine to understand how and where to operate, some sort of reference information needs to be provided nevertheless. The best way to do this is by enriching the HTML with structuring metadata, giving the HTML a semantic structure and providing meaning beyond the markup required for a browser to render it:
 
@@ -23,7 +23,7 @@ The above HTML fragment has been annotated with [RDFa](https://www.w3.org/TR/htm
 
 Instead of reinventing the wheel and coming up with a proprietary set of attributes, Templado makes use of these attributes to map data from a View Model into the HTML. This is done by calling the relevant method from or by accessing a public property of the given view model. Depending on the returned type, Templado will decide what to do next. 
 
-### How Templado's ViewModel Rendering works
+#### How rendering works
 
 The view model renderer operates on the internal DOM representation of the template: Starting from the root element - also called `DocumentElement` -, Templado iterates over all its children and also follows the paths down each respective subtree recursively. Whenever one of the RDFa attributes [vocab](#vocab), [property](#property) or [typeof](#typeof) is encountered, the method associated with it will get called on the current view model context. If the returned value for a `property` triggered call happens to be an object, it's considered a view model and thus replaces the view model for the current tree position and all their nested elements - until potentially overwritten by yet another view model. This effectively allows for walking down the document tree.
 
@@ -81,46 +81,55 @@ class MyRootViewModel {
 
 So in other words: By default, the document structure and the placement of `property` attributes mainly define the required nesting of view models. Of course there are exceptions to every rule and Templado provides two means to avoid or rather break out of the nesting: By using a [prefix](#prefix) or by specifying a [resource](#resource). Please refer to the respective paragraph for more details on those.
 
-### Operating on HTML Attributes
-
-Apart from setting the text content of an element, Templado generally supports changing the value of or entirely removing attributes. 
-
-NOTE: To not break Templado's flow of operation, the supported RDFa attributes are excluded and can **not** be changed or removed using a view model.   
-
 ### Implementing a View Model
 
-To be used as Templado View Model the implementing class generally is not required to fulfill any templado specific interface, as you might have guessed given the above examples. While that may seem odd from an object-oriented programming perspective, the methods or properties that need to be provided highly depend on the HTML markup and the used RDFa annotations. From Templado's perspective, there is nothing specific enough to require in terms of an interface - except it being an object.
+To be used as a Templado View Model the implementing class generally is not required to fulfill any Templado specific interface, as you might have guessed given the above examples. While that may seem odd from an object-oriented programming perspective, the methods or properties that need to be provided highly depend on the HTML markup and the used RDFa annotations. From Templado's perspective, there is nothing specific enough to require it in terms of an interface. All we need is it to be an object.
 
-NOTE: Many templating engines accept nested associative arrays as models. As PHP unfortunately so far does not differentiate between lists and dictionaries, it is close to impossible to tell whether the key and its value is supposed to be relevant or should be rather ignored. It was thus a deliberate design decision to **not** support associative arrays as models. Templado will treat everything that is iterable as a list.  
+NOTE: Many templating engines accept nested associative arrays as models, what other programming languages call a dictionary. As PHP unfortunately does not differentiate between lists and dictionaries, it is close to impossible to reliably tell whether the key and its value are supposed to be relevant or should be rather ignored. It was thus a deliberate design decision to **not** support associative arrays as models. Templado treats everything that is iterable as a list to iterate over, ignoring potential keys and their values.
 
-### Supported Return Types for `property`
+If all you have is an associative array, you could build a simple object wrapper around it using PHP's magic method `__get`:
 
-#### String
+```php
+class ArrayToObjectWrapper {
+    public function __construct(private array $data) {}
 
-#### Signal::ignore (or true)
+    public function __get(string $key): mixed {
+        if (!array_key_exists($key, $this->data)) {
+            return null;
+        }
+        
+        $value = $this->data[$key];
+        
+        if (!is_array($value)) {
+            return $value;
+        }
+        
+        if (array_is_list($value)) {
+            return $value;
+        }
+        
+        return new self($value);
+    }
+}
+```
 
-#### Signal::remove (or false)
+WARNING: The above wrapper example uses [`array_is_list`](https://www.php.net/manual/en/function.array-is-list.php) to determine whether the array provided is a dictionary or a list. PHP considers an array a list if its keys consist of consecutive numbers from 0 to count($array)-1. This may not apply to your data structure and thus could be unreliable.  
 
-#### Iterables (Arrays or Iterator)
-
-#### View Model Objects
-
-
-### Supported RDFa Attributes
+### Understood RDFa Attributes
 
 While the RDFa standard contains a lot of attributes, Temoplado only looks for a small subset when performing its rendering work. This section describes which attributes are understood, and what the expected behaviour of the view model is for each.
 
 #### vocab
 
-RDFa in HTML is an open standard to semantically enhance markup. To make sense of a set of RDFa nodes, they commonly get semantically grouped into so-called vocabularies. Think of a class or even multiple classes grouping various properties into a meaningful _something_. This _something_ would be your vocabulary in RDFa's terminology.  
+RDFa in HTML is an open standard to semantically enhance markup. To make sense of a set of RDFa nodes, they commonly get semantically grouped into so-called vocabularies. Think of a class or even multiple classes grouping various properties into a meaningful _something_. This _something_ would be your vocabulary in RDFa's terminology.
 
-Of course not all vocabularies are yours and thus most are not relevant for view model rendering. So in case your template contains RDFa attributes from other vocabularies, Templado needs to get told which ones to operate on. 
+Of course not all vocabularies are yours and thus most are not relevant for view model rendering. So in case your template contains RDFa attributes from other vocabularies, Templado needs to get told which ones to operate on.
 
 NOTE: If you do not include third party vocabularies in your templates, you do not need to set the `vocab` attribute nor implement support into your view model.
 
 Whenever a `vocab` attribute is encountered while walking down the DOM tree, Templado checks whether the current view model implements a `vocab()` method. If not, the attribute is ignored. Otherwise, Templado will call the method, passing in the value of the `vocab` attribute. The return value is expected to be a string that Templado then can compare against the specified vocab - as in, the value of the vocab attribute. If they match, Templado considers the view model to be responsible for this vocabulary and will try to render it.
 
-A simple HTML fragment, that has a `vocab` attribute set could look like this:
+Again, this is probably best understood with an example. A simple HTML fragment, that has a `vocab` attribute set could look like this:
 
 ```html
 <p vocab="https://example.com#book">Hello world</p>
@@ -150,16 +159,53 @@ class MyRootModel {
 }
 ```
 
-If you want to __not__ have the view model be applied, you have to return a none-matching string. So the last two examples above would already qualify as not responsible, if the requested vocabulary would for instance be "https://schema.org". 
+If you want to __not__ have the view model be applied, you have to return a none-matching string. So if the requested vocabulary would for instance be "https://schema.org", the last two examples above would already qualify as not being responsible.
 
-The first example simply returns the input string and thus would be considered responsible. Given it always returns the input, the implementation could just as well be removed as it's technically identical to _not_ having a `vocab()` method at all.
+The first example simply returns the input string and thus would always be considered responsible. The implementation could just as well be removed as it's technically identical to _not_ having a `vocab()` method at all - but some prefer to make it explicit.
 
 
 #### property
+
+
+##### Supported Return Types 
+
+###### String
+
+###### Signal::ignore (or true)
+
+###### Signal::remove (or false)
+
+###### Iterables (e.g. Arrays or Iterator)
+
+###### View Model Objects
+
+
+##### Operating on HTML Attributes
+
+Apart from setting the text content of an element, Templado supports changing the value of or entirely removing existing attributes. Templado will *not* add new attributes.
+
+NOTE: To not break Templado's flow of operation, the supported RDFa attributes are protected and can **not** be changed or removed using a view model. If you prefer to have RDFa attributes removed at the end of processing, this can be achieved by using the [Serliazer](serializing.md).
+
+
+###### Supported Types for Attribute Rendering
+
+####### String
+
+####### Signal::ignore (or true)
+
+####### Signal::remove (or false)
+
+
 
 #### resource
 
 #### prefix
 
 #### typeof
+
+
+
+
+
+
 
