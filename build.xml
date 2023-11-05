@@ -8,14 +8,14 @@
         <delete dir="${basedir}/build/public"/>
     </target>
 
-    <target name="publish">
+    <target name="publish" description="Publish current state of document">
         <exec executable="${mkdocs}" >
             <env key="VIRTUAL_ENV" value="${venv}" />
             <arg line="gh-deploy --force --strict --clean --verbose" />
         </exec>
     </target>
 
-    <target name="serve">
+    <target name="serve" description="Service locally">
         <exec executable="${mkdocs}" >
             <env key="VIRTUAL_ENV" value="${venv}" />
             <arg line="serve --dirty" />
