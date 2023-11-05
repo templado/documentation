@@ -19,13 +19,13 @@ Instead of mixing view logic with markup by embedding instructions into the HTML
 </section>
 ```
 
-The above HTML fragment has been annotated with [RDFa](https://www.w3.org/TR/html-rdfa/) attributes. In this case, only the `property` attribute has been used though. When following the tree structure, one can now understand that the text content of the "h3" element contains the `name` of an `author` and that his `business` `email` address is "john@example.org".
+The above HTML fragment has been annotated with [RDFa](https://www.w3.org/TR/html-rdfa/) attributes, a W3C standard to enrich markup with semantic information. In this case, only the `property` attribute has been used though. When following the tree structure, one can now understand that the text content of the "h3" element contains the `name` of an `author` and that his `business` `email` address is "john@example.org".
 
-Instead of reinventing the wheel and coming up with a proprietary set of attributes, Templado makes use of these attributes to map data from a View Model into the HTML. This is done by calling the relevant method from or by accessing a public property of the given view model. Depending on the returned type, Templado will decide what to do next. 
+Instead of reinventing the wheel and coming up with a proprietary set of attributes, Templado makes use of these standard attributes to map data from a View Model into the HTML. This is done by calling the relevant method from or by accessing a public property of the given view model. Depending on the returned type, Templado will decide what to do next. 
 
 #### How rendering works
 
-The view model renderer operates on the internal DOM representation of the template: Starting from the root element - also called `DocumentElement` -, Templado iterates over all its children and also follows the paths down each respective subtree recursively. Whenever one of the RDFa attributes [vocab](#vocab), [property](#property) or [typeof](#typeof) is encountered, the method associated with it will get called on the current view model context. If the returned value for a `property` triggered call happens to be an object, it's considered a view model and thus replaces the view model for the current tree position and all their nested elements - until potentially overwritten by yet another view model. This effectively allows for walking down the document tree.
+The view model renderer operates on the internal DOM representation of the template: Starting from the root element - also called `DocumentElement` -, Templado iterates over all its children and also follows the paths down each respective subtree recursively. Whenever one of the RDFa attributes [property](#property), [typeof](#typeof) or [vocab](#vocab) is encountered, the method associated with it will get called on the current view model. If the returned value for a `property` triggered call happens to be an object which is not an iterator or generator, it's considered a view model and thus replaces the view model for the current tree position and all their nested elements - until potentially overwritten by yet another view model. This effectively allows for walking down the document tree.
 
 This probably is best explained with an example. Let's assume this very basic HTML fragment is our template:
 
@@ -163,47 +163,94 @@ If you want to __not__ have the view model be applied, you have to return a none
 
 The first example simply returns the input string and thus would always be considered responsible. The implementation could just as well be removed as it's technically identical to _not_ having a `vocab()` method at all - but some prefer to make it explicit.
 
-
 #### property
 
+The `property` annotation is the attribute used to tell Templado to apply or change content - as can be seen to some extent in the examples above already. In general, the value of this attribute is interpreted as the name of the method to be called on the current view model or the name of the public property to be read from it.
+ 
+If the value of this attribute contains a `:` though, Templado splits the string at the location of the double colon, interpreting the first part as a [prefix](#prefix) and the remainder as the method to call or property to access. Given a prefix is set, the current view model context is ignored and the model to operate on is resolved using the found prefix. For this to succeed, the [prefix](#prefix) has to have been bound to an object beforehand. Please read the description of [prefix](#prefix) to learn more about this feature.
 
-##### Supported Return Types 
+When the `property` annotation resolves to a method call, the current textual value of the context element is passed along by Templado.
+This allows for simple placeholders to replaced or existing textual content to be extended without having to duplicate it into the view model.
+
+NOTE: While the textual content of an element may be technically composed out of various (even nested) markup elements, only their respective text is passed along. E.g. `<p>hello <b>world</b> out there!</p>` would translate to `hello world out there!`, effectively stripping any markup contained.
+
+##### Supported Types 
+
+Templado expects the type of the accessed property or the value returned by a method to be either a string, an array or object - where some object types do have special meaning as listed below. For backwards compatibility, a boolean type is also supported. Returning any other type will cause Templado to throw an exception.
 
 ###### String
 
+When a `string` is returned, Templado will replace the current element's content with its value. Be aware that this effectively also removes any other children the current element might have had:
+
+```html
+<p property="templado">Hello <b>world</b> out there!</p>
+```
+
+```php
+class StringViewModel {
+    public string $templado = 'Templado';    
+}
+```
+
+```html
+<p property="templado">Templado</p>
+```
+
 ###### Signal::ignore (or true)
+
+Sometimes, Templado needs to be told to skip over an element even though a property attribute had been set and just continue as if none would have been. This can be achieved by returning a `Signal::ignore()`. For backwards compatibility, a boolean `true` can also be used. 
+
+Ignoring an element will not change the current view model context.
 
 ###### Signal::remove (or false)
 
+To have the current element and thus all its children be removed from the document, a `Signal::remove()` can be returned. For backwards compatibility, a boolean `false` can also be used.
+
+Removing an element will not change the current view model context.
+
 ###### Iterables (e.g. Arrays or Iterator)
 
+Iterable types are Templado's equivalent of "foreach". The current element will be cloned and the content adjusted for as many times as there are items returned while iterating.
+
+NOTE: To preview how for example a list of items would look like, the template document may contain the same element with the same `property` value multiple times. Templado will extract and clone the first one to copy it as many times as needed while iterating, removing all additional elements with the same property value in the current context.
+
+Each iterative call to the view model must either yield a string or new view model object. Direct nesting of iterables or signaling is not supported. 
+
 ###### View Model Objects
+
+*** DOCUMENTATION PENDING ***
+
+
 
 
 ##### Operating on HTML Attributes
 
 Apart from setting the text content of an element, Templado supports changing the value of or entirely removing existing attributes. Templado will *not* add new attributes.
 
-NOTE: To not break Templado's flow of operation, the supported RDFa attributes are protected and can **not** be changed or removed using a view model. If you prefer to have RDFa attributes removed at the end of processing, this can be achieved by using the [Serliazer](serializing.md).
+NOTE: To not break Templado's flow of operation, the supported RDFa attributes are protected and can **not** be changed or removed using a view model. If you prefer to have RDFa attributes removed at the end of processing, this can be achieved by using a [Serializer](serializing.md) or [Transformation](transformation.md). 
 
 
 ###### Supported Types for Attribute Rendering
 
-####### String
+**String**
 
-####### Signal::ignore (or true)
+**Signal::ignore (or true)**
 
-####### Signal::remove (or false)
+**Signal::remove (or false)**
 
 
 
 #### resource
 
+*** DOCUMENTATION PENDING ***
+
 #### prefix
+
+*** DOCUMENTATION PENDING ***
 
 #### typeof
 
-
+*** DOCUMENTATION PENDING ***
 
 
 
