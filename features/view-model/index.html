@@ -66,7 +66,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#property">property</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#supported-return-types">Supported Return Types</a>
+    <li class="toctree-l4"><a class="reference internal" href="#supported-types">Supported Types</a>
     </li>
     <li class="toctree-l4"><a class="reference internal" href="#operating-on-html-attributes">Operating on HTML Attributes</a>
     </li>
@@ -153,10 +153,10 @@
     &lt;a property=&quot;email&quot; typeoOf=&quot;business&quot; href=&quot;mailto:john@example.org&quot;&gt;E-Mail me&lt;/a&gt;
 &lt;/section&gt;
 </code></pre>
-<p>The above HTML fragment has been annotated with <a href="https://www.w3.org/TR/html-rdfa/">RDFa</a> attributes. In this case, only the <code>property</code> attribute has been used though. When following the tree structure, one can now understand that the text content of the "h3" element contains the <code>name</code> of an <code>author</code> and that his <code>business</code> <code>email</code> address is "john@example.org".</p>
-<p>Instead of reinventing the wheel and coming up with a proprietary set of attributes, Templado makes use of these attributes to map data from a View Model into the HTML. This is done by calling the relevant method from or by accessing a public property of the given view model. Depending on the returned type, Templado will decide what to do next. </p>
+<p>The above HTML fragment has been annotated with <a href="https://www.w3.org/TR/html-rdfa/">RDFa</a> attributes, a W3C standard to enrich markup with semantic information. In this case, only the <code>property</code> attribute has been used though. When following the tree structure, one can now understand that the text content of the "h3" element contains the <code>name</code> of an <code>author</code> and that his <code>business</code> <code>email</code> address is "john@example.org".</p>
+<p>Instead of reinventing the wheel and coming up with a proprietary set of attributes, Templado makes use of these standard attributes to map data from a View Model into the HTML. This is done by calling the relevant method from or by accessing a public property of the given view model. Depending on the returned type, Templado will decide what to do next. </p>
 <h4 id="how-rendering-works">How rendering works</h4>
-<p>The view model renderer operates on the internal DOM representation of the template: Starting from the root element - also called <code>DocumentElement</code> -, Templado iterates over all its children and also follows the paths down each respective subtree recursively. Whenever one of the RDFa attributes <a href="#vocab">vocab</a>, <a href="#property">property</a> or <a href="#typeof">typeof</a> is encountered, the method associated with it will get called on the current view model context. If the returned value for a <code>property</code> triggered call happens to be an object, it's considered a view model and thus replaces the view model for the current tree position and all their nested elements - until potentially overwritten by yet another view model. This effectively allows for walking down the document tree.</p>
+<p>The view model renderer operates on the internal DOM representation of the template: Starting from the root element - also called <code>DocumentElement</code> -, Templado iterates over all its children and also follows the paths down each respective subtree recursively. Whenever one of the RDFa attributes <a href="#property">property</a>, <a href="#typeof">typeof</a> or <a href="#vocab">vocab</a> is encountered, the method associated with it will get called on the current view model. If the returned value for a <code>property</code> triggered call happens to be an object which is not an iterator or generator, it's considered a view model and thus replaces the view model for the current tree position and all their nested elements - until potentially overwritten by yet another view model. This effectively allows for walking down the document tree.</p>
 <p>This probably is best explained with an example. Let's assume this very basic HTML fragment is our template:</p>
 <pre><code class="language-html">&lt;article property=&quot;article&quot;&gt;
     &lt;h1&gt;Article Headline&lt;/h1&gt;    
@@ -266,25 +266,57 @@ class Section {
 <p>If you want to <strong>not</strong> have the view model be applied, you have to return a none-matching string. So if the requested vocabulary would for instance be "https://schema.org", the last two examples above would already qualify as not being responsible.</p>
 <p>The first example simply returns the input string and thus would always be considered responsible. The implementation could just as well be removed as it's technically identical to <em>not</em> having a <code>vocab()</code> method at all - but some prefer to make it explicit.</p>
 <h4 id="property">property</h4>
-<h5 id="supported-return-types">Supported Return Types</h5>
+<p>The <code>property</code> annotation is the attribute used to tell Templado to apply or change content - as can be seen to some extent in the examples above already. In general, the value of this attribute is interpreted as the name of the method to be called on the current view model or the name of the public property to be read from it.</p>
+<p>If the value of this attribute contains a <code>:</code> though, Templado splits the string at the location of the double colon, interpreting the first part as a <a href="#prefix">prefix</a> and the remainder as the method to call or property to access. Given a prefix is set, the current view model context is ignored and the model to operate on is resolved using the found prefix. For this to succeed, the <a href="#prefix">prefix</a> has to have been bound to an object beforehand. Please read the description of <a href="#prefix">prefix</a> to learn more about this feature.</p>
+<p>When the <code>property</code> annotation resolves to a method call, the current textual value of the context element is passed along by Templado.
+This allows for simple placeholders to replaced or existing textual content to be extended without having to duplicate it into the view model.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the textual content of an element may be technically composed out of various (even nested) markup elements, only their respective text is passed along. E.g. <code>&lt;p&gt;hello &lt;b&gt;world&lt;/b&gt; out there!&lt;/p&gt;</code> would translate to <code>hello world out there!</code>, effectively stripping any markup contained.</p>
+</div>
+<h5 id="supported-types">Supported Types</h5>
+<p>Templado expects the type of the accessed property or the value returned by a method to be either a string, an array or object - where some object types do have special meaning as listed below. For backwards compatibility, a boolean type is also supported. Returning any other type will cause Templado to throw an exception.</p>
 <h6 id="string">String</h6>
+<p>When a <code>string</code> is returned, Templado will replace the current element's content with its value. Be aware that this effectively also removes any other children the current element might have had:</p>
+<pre><code class="language-html">&lt;p property=&quot;templado&quot;&gt;Hello &lt;b&gt;world&lt;/b&gt; out there!&lt;/p&gt;
+</code></pre>
+<pre><code class="language-php">class StringViewModel {
+    public string $templado = 'Templado';    
+}
+</code></pre>
+<pre><code class="language-html">&lt;p property=&quot;templado&quot;&gt;Templado&lt;/p&gt;
+</code></pre>
 <h6 id="signalignore-or-true">Signal::ignore (or true)</h6>
+<p>Sometimes, Templado needs to be told to skip over an element even though a property attribute had been set and just continue as if none would have been. This can be achieved by returning a <code>Signal::ignore()</code>. For backwards compatibility, a boolean <code>true</code> can also be used. </p>
+<p>Ignoring an element will not change the current view model context.</p>
 <h6 id="signalremove-or-false">Signal::remove (or false)</h6>
+<p>To have the current element and thus all its children be removed from the document, a <code>Signal::remove()</code> can be returned. For backwards compatibility, a boolean <code>false</code> can also be used.</p>
+<p>Removing an element will not change the current view model context.</p>
 <h6 id="iterables-eg-arrays-or-iterator">Iterables (e.g. Arrays or Iterator)</h6>
+<p>Iterable types are Templado's equivalent of "foreach". The current element will be cloned and the content adjusted for as many times as there are items returned while iterating.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>To preview how for example a list of items would look like, the template document may contain the same element with the same <code>property</code> value multiple times. Templado will extract and clone the first one to copy it as many times as needed while iterating, removing all additional elements with the same property value in the current context.</p>
+</div>
+<p>Each iterative call to the view model must either yield a string or new view model object. Direct nesting of iterables or signaling is not supported. </p>
 <h6 id="view-model-objects">View Model Objects</h6>
+<p>*** DOCUMENTATION PENDING ***</p>
 <h5 id="operating-on-html-attributes">Operating on HTML Attributes</h5>
 <p>Apart from setting the text content of an element, Templado supports changing the value of or entirely removing existing attributes. Templado will <em>not</em> add new attributes.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>To not break Templado's flow of operation, the supported RDFa attributes are protected and can <strong>not</strong> be changed or removed using a view model. If you prefer to have RDFa attributes removed at the end of processing, this can be achieved by using the <a href="../serializing/">Serliazer</a>.</p>
+<p>To not break Templado's flow of operation, the supported RDFa attributes are protected and can <strong>not</strong> be changed or removed using a view model. If you prefer to have RDFa attributes removed at the end of processing, this can be achieved by using a <a href="../serializing/">Serializer</a> or <a href="../transformation/">Transformation</a>. </p>
 </div>
 <h6 id="supported-types-for-attribute-rendering">Supported Types for Attribute Rendering</h6>
-<h6 id="string_1"># String</h6>
-<h6 id="signalignore-or-true_1"># Signal::ignore (or true)</h6>
-<h6 id="signalremove-or-false_1"># Signal::remove (or false)</h6>
+<p><strong>String</strong></p>
+<p><strong>Signal::ignore (or true)</strong></p>
+<p><strong>Signal::remove (or false)</strong></p>
 <h4 id="resource">resource</h4>
+<p>*** DOCUMENTATION PENDING ***</p>
 <h4 id="prefix">prefix</h4>
+<p>*** DOCUMENTATION PENDING ***</p>
 <h4 id="typeof">typeof</h4>
+<p>*** DOCUMENTATION PENDING ***</p>
               
             </div>
           </div><footer>
