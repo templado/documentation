@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Templado Documentation" default="serve" basedir=".">
     <property name="source" value="src"/>
-    <property name="venv" value="${basedir}/.mkdocs" />
+    <property name="venv" value="${basedir}/venv" />
     <property name="mkdocs" value="${venv}/bin/mkdocs" />
 
     <target name="clean" description="Clean up and create artifact directories">
