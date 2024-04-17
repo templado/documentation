@@ -73,6 +73,22 @@
               <p class="caption"><span class="caption-text">Migration</span></p>
               <ul class="current">
                   <li class="toctree-l1 current"><a class="reference internal current" href="./">Templado 4.x</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#updated-and-changed-requirements">Updated and Changed Requirements</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#loading-facade-templado-removed">Loading Facade Templado removed</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#dealing-with-potential-parse-errors">Dealing with potential parse errors</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#everything-is-a-document-now">Everything is a Document now</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#migrating-snippets">Migrating Snippets</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#todo">TODO</a>
+    </li>
+    </ul>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Resources</span></p>
@@ -97,8 +113,8 @@
       <div class="wy-nav-content">
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
-          <li>Migration &raquo;</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Migration</li>
       <li class="breadcrumb-item active">Templado 4.x</li>
     <li class="wy-breadcrumbs-aside">
           <a href="https://github.com/templado/documentation/blob/main/src/migrate/templado4.md" class="icon icon-github"> Edit on GitHub</a>
@@ -109,7 +125,69 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                
+                <h2 id="migration-from-templado-4x">Migration from Templado 4.x</h2>
+<h3 id="updated-and-changed-requirements">Updated and Changed Requirements</h3>
+<p>In contrast to Templado 4, which was designed to work in PHP 7, Templado 5 requires PHP 8.2 or later. Additionally, as Templado 5 ships with an enhanced custom HTML 5 Serializer implementation, the new requirement of <code>ext/xmlwriter</code> has been added.</p>
+<h3 id="loading-facade-templado-removed">Loading Facade <code>Templado</code> removed</h3>
+<p>In Templado 4.x and earlier, a facade named <code>Templado</code> existed which provided static factory methods to create <code>HTML</code> instances from files or strings. This extra facade was deemed superfluous and got removed.</p>
+<p>It's functionality got, in part, replaced by <code>Document::fromString</code>. As Templado no longer performs any file loading operations itself, the class <code>FileName</code> got removed.</p>
+<p>This means the following calls would need to get changed from</p>
+<pre><code class="language-php">$html1 = Templado::loadHTMLFile(new FileName(...));
+
+$html2 = Templado::parseHtmlString(...);
+</code></pre>
+<p>to</p>
+<pre><code class="language-php">$html1 = Document::fromString(file_get_contents(...));
+
+$html2 = Document::fromString(...);
+</code></pre>
+<p>This should be a simple search-and-replace refactoring.</p>
+<h3 id="dealing-with-potential-parse-errors">Dealing with potential parse errors</h3>
+<p>As Templado 5 does no longer provide a loading facade, the respective exceptions are also gone. If you want to catch any issues with parsing when using the <code>Document::fromString</code> method you can now explicitly catch <code>Templado\Engine\ParsingException</code> rather than the old rather generic <code>TempladoException</code>. To learn the details on what actually went wrong, you can ask the exception instance object for the <code>LibXMLError</code> instances using <code>Templado\Engine\ParsingException::errors()</code>.</p>
+<h3 id="everything-is-a-document-now">Everything is a <code>Document</code> now</h3>
+<p>In Templado 4.x and earlier, every rendering operation could be applied on a document using the <code>HTML</code> facade object - optionally created by the aforementioned factory facade. To support merging fragments into documents, the concept of so-called snippets existed, represented by multiple types of <code>Snippet</code> classes. In a nutshell, these merely served as a glorified transfer object and implemented different strategies on how the merge should be performed.</p>
+<p>This concept turned out to be rather impractical, hard to understand and limiting in practical use, so for Templado 5, the concept of a snippet being different from an HTML document got dropped. Everything is now a <code>Document</code>, regardless whether it represents a complete HTML structure or merely a fragment.</p>
+<h4 id="migrating-snippets">Migrating Snippets</h4>
+<p>To migrate from Templado 4, all explicit calls to load or instantiate a Snippet need to get replaced by calls to <code>Document</code> and the best matching factory method. As already mentioned, Templado no longer performs filesystem operations itself. This means, the previously existing <code>SnippetLoader</code> used in the following example to create <code>$snippet3</code> has been removed.</p>
+<pre><code class="language-php">$snippet1 = new \Templado\Engine\SimpleSnippet('some-id', $dom);
+
+$snippet2 = new \Templado\Engine\TempladoSnippet('some-id', $dom);
+
+$snippet3 = (new SnippetLoader)-&gt;load(new FileName('...'), 'optionally-id-here');
+</code></pre>
+<p>For merging of documents (or previously snippets), the to-be-merged objects must have an ID set. To ensure the syntactical validity according to W3C rules, a new value object <code>Id</code> got introduced and replaces the scalar string type used before.</p>
+<p>In Templado 4 when using the <code>SnippetLoader</code>, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. 
+As the loader functionality got removed, this is technically no longer possible.</p>
+<p>The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source for errors. </p>
+<p>The above code examples should thus be replaced as follows:</p>
+<pre><code class="language-php">$snippet1 = \Templado\Engine\Document::fromDomDocument($dom, new Id('some-id'));
+
+$snippet2 = \Templado\Engine\Document::fromDomDocument($dom, new Id('some-id'));
+
+$snippet3 = \Templado\Engine\Document::fromString(
+    file_get_contents('...'), 
+    new Id('no-longer-optional-id-here')
+);
+</code></pre>
+<hr />
+<h3 id="todo">TODO</h3>
+<pre><code>HTML::applySnippets =&gt; Document::merge
+
+
+SnippetListCollection =&gt; DocumentCollection
+
+SnippetListCollection::addSnippet =&gt; DocumentCollection::add
+
+Transformation::getSelector =&gt; Transformation::selector
+
+
+Namespace of snippets wrapper document:
+
+snippet : https://templado.io/snippet/1.0 =&gt; document : https://templado.io/document/1.0
+
+
+HTML::asString() =&gt; Document::asString(new HTMLSerializer)
+</code></pre>
               
             </div>
           </div><footer>
