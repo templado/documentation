@@ -57,7 +57,7 @@ In Templado 4.x and earlier, every rendering operation could be applied on a doc
 
 This concept turned out to be rather impractical, hard to understand and limiting in practical use, so for Templado 5, the concept of a snippet being different from an HTML document got dropped. Everything is now a `Document`, regardless whether it represents a complete HTML structure or merely a fragment.
 
-Accordingly, throught a code base using Templado 4, all type declarations need to get changed from `HTML` or `Snippet` to `Document`.
+Accordingly, throughout a code base using Templado 4, all type declarations need to get changed from `HTML` or `Snippet` to `Document`.
 
 #### Migrating Snippets
 
@@ -73,7 +73,7 @@ $snippet3 = (new SnippetLoader)->load(new FileName('...'), 'optionally-id-here')
 
 For merging of documents (or previously snippets), the to-be-merged objects must have an ID set. To ensure the syntactical validity according to W3C rules, a new value object `Id` got introduced and replaces the scalar string type used before.
 
-NOTE: In Templado 4 when using the `SnippetLoader`, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. As the loader functionality got removed, this is technically no longer possible. The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source for errors. 
+NOTE: In Templado 4 when using the `SnippetLoader`, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. As the loader functionality got removed, this is technically no longer possible. The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source of errors. 
 
 The above code examples should thus be replaced as follows:
 
@@ -90,11 +90,11 @@ $snippet3 = \Templado\Engine\Document::fromString(
 
 #### Merging Documents instead of Applying Snippets
 
-As the technically separate concept of a Snippet got dropped, the API to get fragments into a (main) document got renamed from `applySnippets` to `merge`.
+As the concept of a technically separate Snippet got dropped, the API to get fragments into a (main) document got renamed from `applySnippets` to `merge`.
 
 This change allows to also merge "fragments" into each other as they also are now just a `Document`.
 
-Furthermore, the API got enhanced to allow for passing one or more `Document` instances directly, without the explicit need for a collection of documents:
+Furthermore, the API got enhanced to allow for passing one or more `Document` instances directly, without the explicit need for a collection of documents.
 
 ```php
 $html = Templado::parseHtmlString(...);
@@ -106,7 +106,7 @@ $list->addSnipet(...);
 $html->applySnippets($list);
 ```
 
-Due to the API change, the above code can be adjusted as follows: 
+Due to the API change, the above Templado 4 code can be adjusted as follows: 
 
 ```php
 $document = Document::fromString('...');
@@ -121,9 +121,10 @@ Of course, alternatively using a collection is still a valid option as well:
 ```php
 $document = Document::fromString('...');
 
-$list = new DocumentCollection();
-$list->add(Document::fromString('...', new Id('...')));
-$list->add(Document::fromString('...', new Id('...')));
+$list = new DocumentCollection(
+    Document::fromString('...', new Id('...')),
+    Document::fromString('...', new Id('...'))
+);
 
 $document->merge($list);
 ```
@@ -139,7 +140,7 @@ Snippets in Templado 4 optionally support having a wrapper element to ensure xml
 </templado:snippet>
 ```
 
-Templado 5.0 documents provide the same option, but use a different namespace as the id lookup mechanism is no longer supported. The root element name in Templado 5 defaults to "document" but is technically irrelevant as only the namespace is currently checked upon merge.
+Templado 5.0 documents provide the same option, but use a different namespace as the id lookup mechanism optionally used in Templado 4 is no longer supported. The root element name in Templado 5 defaults to "document" but is technically irrelevant as only the namespace is currently checked upon merge.
 
 ```xml
 <templado:document xmlns="http://www.w3.org/1999/xhtml" xmlns:templado="https://templado.io/document/1.0">
