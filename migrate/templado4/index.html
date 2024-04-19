@@ -84,6 +84,10 @@
         <ul>
     <li class="toctree-l3"><a class="reference internal" href="#migrating-snippets">Migrating Snippets</a>
     </li>
+    <li class="toctree-l3"><a class="reference internal" href="#merging-documents-instead-of-applying-snippets">Merging Documents instead of Applying Snippets</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#snippet-document-namespace-changed">Snippet Document Namespace changed</a>
+    </li>
         </ul>
     </li>
     <li class="toctree-l2"><a class="reference internal" href="#todo">TODO</a>
@@ -130,12 +134,11 @@
 <p>The main changes are:</p>
 <ul>
 <li>Requires PHP 8.2+</li>
-<li>Templado 5.0 is quite a bit faster than 4.x</li>
 <li><code>HTML</code> and <code>Snippet</code> got logically merged into a <code>Document</code>, representing both types</li>
 <li>A new <code>HTMLSerializer</code> has been introduced to generate HTML 5 output</li>
 <li>ViewModels now can have<ul>
 <li>public properties to satisfy the rendering needs</li>
-<li>return a signal instance rather than relying on bool types</li>
+<li>return a signal instance rather than relying on bool types and null</li>
 </ul>
 </li>
 <li>Form data handling now supports nested structures as well as fields referenced by id</li>
@@ -144,7 +147,7 @@
 <li>Enhanced trace output in case of errors</li>
 <li>Snapshot support</li>
 </ul>
-<p>The following paragraphs gives more in-depth details on these changes.</p>
+<p>The following paragraphs give more in-depth details on these changes.</p>
 <h3 id="updated-and-changed-requirements">Updated and Changed Requirements</h3>
 <p>In contrast to Templado 4, which was designed to work with PHP 7+, Templado 5 requires PHP 8.2 and later. Additionally, as Templado 5 ships with an enhanced custom HTML 5 Serializer implementation, a new requirement to <code>ext/xmlwriter</code> has been added.</p>
 <h3 id="loading-facade-templado-removed">Loading Facade <code>Templado</code> removed</h3>
@@ -190,22 +193,50 @@ $snippet3 = \Templado\Engine\Document::fromString(
     new Id('no-longer-optional-id-here')
 );
 </code></pre>
+<h4 id="merging-documents-instead-of-applying-snippets">Merging Documents instead of Applying Snippets</h4>
+<p>As the technically separate concept of a Snippet got dropped, the API to get fragments into a (main) document got renamed from <code>applySnippets</code> to <code>merge</code>.</p>
+<p>This change allows to also merge "fragments" into each other as they also are now just a <code>Document</code>.</p>
+<p>Furthermore, the API got enhanced to allow for passing one or more <code>Document</code> instances directly, without the explicit need for a collection of documents:</p>
+<pre><code class="language-php">$html = Templado::parseHtmlString(...);
+
+$list = new SnippetListCollection();
+$list-&gt;addSnipet(...);
+$list-&gt;addSnipet(...);
+
+$html-&gt;applySnippets($list);
+</code></pre>
+<p>Due to the API change, the above code can be adjusted as follows: </p>
+<pre><code class="language-php">$document = Document::fromString('...');
+$document-&gt;merge(
+   Document::fromString('...', new Id('...')),
+   Document::fromString('...', new Id('...'))
+);
+</code></pre>
+<p>Of course, alternatively using a collection is still a valid option as well:</p>
+<pre><code class="language-php">$document = Document::fromString('...');
+
+$list = new DocumentCollection();
+$list-&gt;add(Document::fromString('...', new Id('...')));
+$list-&gt;add(Document::fromString('...', new Id('...')));
+
+$document-&gt;merge($list);
+</code></pre>
+<h4 id="snippet-document-namespace-changed">Snippet Document Namespace changed</h4>
+<p>Snippets in Templado 4 optionally support having a wrapper element to ensure xml compliance when otherwise multiple root elements would exist:</p>
+<pre><code class="language-xml">&lt;templado:snippet xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:templado=&quot;https://templado.io/snippet/1.0&quot;&gt;
+ &lt;h1&gt;Title&lt;/h1&gt;
+ &lt;p&gt;text here&lt;/p&gt;
+&lt;/templado:snippet&gt;
+</code></pre>
+<p>Templado 5.0 documents provide the same option, but use a different namespace as the id lookup mechanism is no longer supported. The root element name in Templado 5 defaults to "document" but is technically irrelevant as only the namespace is currently checked upon merge.</p>
+<pre><code class="language-xml">&lt;templado:document xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:templado=&quot;https://templado.io/document/1.0&quot;&gt;
+ &lt;h1&gt;Title&lt;/h1&gt;
+ &lt;p&gt;text here&lt;/p&gt;
+&lt;/templado:snippet&gt;
+</code></pre>
 <hr />
 <h3 id="todo">TODO</h3>
-<pre><code>HTML::applySnippets =&gt; Document::merge
-
-
-SnippetListCollection =&gt; DocumentCollection
-
-SnippetListCollection::addSnippet =&gt; DocumentCollection::add
-
-Transformation::getSelector =&gt; Transformation::selector
-
-
-Namespace of snippets wrapper document:
-
-snippet : https://templado.io/snippet/1.0 =&gt; document : https://templado.io/document/1.0
-
+<pre><code>Transformation::getSelector =&gt; Transformation::selector
 
 HTML::asString() =&gt; Document::asString(new HTMLSerializer)
 </code></pre>
