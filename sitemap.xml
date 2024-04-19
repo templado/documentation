@@ -2,67 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.templado.io/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/first-steps/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/install/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/extend/filters/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/extend/selectors/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/extend/serializers/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/extend/transformations/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/features/form-handling/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/features/merge/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/features/serializing/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/features/transformation/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/features/view-model/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.templado.io/migrate/templado4/</loc>
-         <lastmod>2024-04-17</lastmod>
+         <lastmod>2024-04-19</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

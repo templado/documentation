@@ -126,11 +126,30 @@
             <div class="section" itemprop="articleBody">
               
                 <h2 id="migration-from-templado-4x">Migration from Templado 4.x</h2>
+<p>In general, migrating from Templado 4.x to Templado 5.0 should be pretty straight forward. The general concepts as well as APIs are mostly kept identical or got enhanced in a backwards compatible way.</p>
+<p>The main changes are:</p>
+<ul>
+<li>Requires PHP 8.2+</li>
+<li>Templado 5.0 is quite a bit faster than 4.x</li>
+<li><code>HTML</code> and <code>Snippet</code> got logically merged into a <code>Document</code>, representing both types</li>
+<li>A new <code>HTMLSerializer</code> has been introduced to generate HTML 5 output</li>
+<li>ViewModels now can have<ul>
+<li>public properties to satisfy the rendering needs</li>
+<li>return a signal instance rather than relying on bool types</li>
+</ul>
+</li>
+<li>Form data handling now supports nested structures as well as fields referenced by id</li>
+<li>A <code>Selector</code> can now be used in more cases to specify what areas of a document to apply the change to</li>
+<li>Optionally <code>vocab</code> aware</li>
+<li>Enhanced trace output in case of errors</li>
+<li>Snapshot support</li>
+</ul>
+<p>The following paragraphs gives more in-depth details on these changes.</p>
 <h3 id="updated-and-changed-requirements">Updated and Changed Requirements</h3>
-<p>In contrast to Templado 4, which was designed to work in PHP 7, Templado 5 requires PHP 8.2 or later. Additionally, as Templado 5 ships with an enhanced custom HTML 5 Serializer implementation, the new requirement of <code>ext/xmlwriter</code> has been added.</p>
+<p>In contrast to Templado 4, which was designed to work with PHP 7+, Templado 5 requires PHP 8.2 and later. Additionally, as Templado 5 ships with an enhanced custom HTML 5 Serializer implementation, a new requirement to <code>ext/xmlwriter</code> has been added.</p>
 <h3 id="loading-facade-templado-removed">Loading Facade <code>Templado</code> removed</h3>
-<p>In Templado 4.x and earlier, a facade named <code>Templado</code> existed which provided static factory methods to create <code>HTML</code> instances from files or strings. This extra facade was deemed superfluous and got removed.</p>
-<p>It's functionality got, in part, replaced by <code>Document::fromString</code>. As Templado no longer performs any file loading operations itself, the class <code>FileName</code> got removed.</p>
+<p>In Templado 4.x and earlier, a facade named <code>Templado</code> existed providing static factory methods to create <code>HTML</code> instances from files or strings. This extra facade was deemed superfluous and got removed.</p>
+<p>It's functionality got, in part, replaced by <code>Document::fromString</code>. Templado 5 no longer performs any file loading operations itself, so the class <code>FileName</code> got removed.</p>
 <p>This means the following calls would need to get changed from</p>
 <pre><code class="language-php">$html1 = Templado::loadHTMLFile(new FileName(...));
 
@@ -147,8 +166,9 @@ $html2 = Document::fromString(...);
 <h3 id="everything-is-a-document-now">Everything is a <code>Document</code> now</h3>
 <p>In Templado 4.x and earlier, every rendering operation could be applied on a document using the <code>HTML</code> facade object - optionally created by the aforementioned factory facade. To support merging fragments into documents, the concept of so-called snippets existed, represented by multiple types of <code>Snippet</code> classes. In a nutshell, these merely served as a glorified transfer object and implemented different strategies on how the merge should be performed.</p>
 <p>This concept turned out to be rather impractical, hard to understand and limiting in practical use, so for Templado 5, the concept of a snippet being different from an HTML document got dropped. Everything is now a <code>Document</code>, regardless whether it represents a complete HTML structure or merely a fragment.</p>
+<p>Accordingly, throught a code base using Templado 4, all type declarations need to get changed from <code>HTML</code> or <code>Snippet</code> to <code>Document</code>.</p>
 <h4 id="migrating-snippets">Migrating Snippets</h4>
-<p>To migrate from Templado 4, all explicit calls to load or instantiate a Snippet need to get replaced by calls to <code>Document</code> and the best matching factory method. As already mentioned, Templado no longer performs filesystem operations itself. This means, the previously existing <code>SnippetLoader</code> used in the following example to create <code>$snippet3</code> has been removed.</p>
+<p>To migrate from Templado 4, all explicit calls to load or instantiate a Snippet need to get replaced by calls to <code>Document</code> and the best matching factory method. As already mentioned, Templado no longer performs filesystem operations itself. This means, the previously existing <code>SnippetLoader</code> used in the following example to create <code>$snippet3</code> has been removed:</p>
 <pre><code class="language-php">$snippet1 = new \Templado\Engine\SimpleSnippet('some-id', $dom);
 
 $snippet2 = new \Templado\Engine\TempladoSnippet('some-id', $dom);
@@ -156,9 +176,10 @@ $snippet2 = new \Templado\Engine\TempladoSnippet('some-id', $dom);
 $snippet3 = (new SnippetLoader)-&gt;load(new FileName('...'), 'optionally-id-here');
 </code></pre>
 <p>For merging of documents (or previously snippets), the to-be-merged objects must have an ID set. To ensure the syntactical validity according to W3C rules, a new value object <code>Id</code> got introduced and replaces the scalar string type used before.</p>
-<p>In Templado 4 when using the <code>SnippetLoader</code>, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. 
-As the loader functionality got removed, this is technically no longer possible.</p>
-<p>The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source for errors. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In Templado 4 when using the <code>SnippetLoader</code>, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. As the loader functionality got removed, this is technically no longer possible. The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source for errors. </p>
+</div>
 <p>The above code examples should thus be replaced as follows:</p>
 <pre><code class="language-php">$snippet1 = \Templado\Engine\Document::fromDomDocument($dom, new Id('some-id'));
 
