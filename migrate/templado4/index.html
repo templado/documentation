@@ -169,7 +169,7 @@ $html2 = Document::fromString(...);
 <h3 id="everything-is-a-document-now">Everything is a <code>Document</code> now</h3>
 <p>In Templado 4.x and earlier, every rendering operation could be applied on a document using the <code>HTML</code> facade object - optionally created by the aforementioned factory facade. To support merging fragments into documents, the concept of so-called snippets existed, represented by multiple types of <code>Snippet</code> classes. In a nutshell, these merely served as a glorified transfer object and implemented different strategies on how the merge should be performed.</p>
 <p>This concept turned out to be rather impractical, hard to understand and limiting in practical use, so for Templado 5, the concept of a snippet being different from an HTML document got dropped. Everything is now a <code>Document</code>, regardless whether it represents a complete HTML structure or merely a fragment.</p>
-<p>Accordingly, throught a code base using Templado 4, all type declarations need to get changed from <code>HTML</code> or <code>Snippet</code> to <code>Document</code>.</p>
+<p>Accordingly, throughout a code base using Templado 4, all type declarations need to get changed from <code>HTML</code> or <code>Snippet</code> to <code>Document</code>.</p>
 <h4 id="migrating-snippets">Migrating Snippets</h4>
 <p>To migrate from Templado 4, all explicit calls to load or instantiate a Snippet need to get replaced by calls to <code>Document</code> and the best matching factory method. As already mentioned, Templado no longer performs filesystem operations itself. This means, the previously existing <code>SnippetLoader</code> used in the following example to create <code>$snippet3</code> has been removed:</p>
 <pre><code class="language-php">$snippet1 = new \Templado\Engine\SimpleSnippet('some-id', $dom);
@@ -181,7 +181,7 @@ $snippet3 = (new SnippetLoader)-&gt;load(new FileName('...'), 'optionally-id-her
 <p>For merging of documents (or previously snippets), the to-be-merged objects must have an ID set. To ensure the syntactical validity according to W3C rules, a new value object <code>Id</code> got introduced and replaces the scalar string type used before.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>In Templado 4 when using the <code>SnippetLoader</code>, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. As the loader functionality got removed, this is technically no longer possible. The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source for errors. </p>
+<p>In Templado 4 when using the <code>SnippetLoader</code>, providing an ID was optional. If none was given, Templado's loader implementation checked whether an ID was set as an attribute on the root element within the loaded document and extracted it from there. As the loader functionality got removed, this is technically no longer possible. The implicit assignment of the ID from content was confusing at best, and, unfortunately, a common source of errors. </p>
 </div>
 <p>The above code examples should thus be replaced as follows:</p>
 <pre><code class="language-php">$snippet1 = \Templado\Engine\Document::fromDomDocument($dom, new Id('some-id'));
@@ -194,9 +194,9 @@ $snippet3 = \Templado\Engine\Document::fromString(
 );
 </code></pre>
 <h4 id="merging-documents-instead-of-applying-snippets">Merging Documents instead of Applying Snippets</h4>
-<p>As the technically separate concept of a Snippet got dropped, the API to get fragments into a (main) document got renamed from <code>applySnippets</code> to <code>merge</code>.</p>
+<p>As the concept of a technically separate Snippet got dropped, the API to get fragments into a (main) document got renamed from <code>applySnippets</code> to <code>merge</code>.</p>
 <p>This change allows to also merge "fragments" into each other as they also are now just a <code>Document</code>.</p>
-<p>Furthermore, the API got enhanced to allow for passing one or more <code>Document</code> instances directly, without the explicit need for a collection of documents:</p>
+<p>Furthermore, the API got enhanced to allow for passing one or more <code>Document</code> instances directly, without the explicit need for a collection of documents.</p>
 <pre><code class="language-php">$html = Templado::parseHtmlString(...);
 
 $list = new SnippetListCollection();
@@ -205,7 +205,7 @@ $list-&gt;addSnipet(...);
 
 $html-&gt;applySnippets($list);
 </code></pre>
-<p>Due to the API change, the above code can be adjusted as follows: </p>
+<p>Due to the API change, the above Templado 4 code can be adjusted as follows: </p>
 <pre><code class="language-php">$document = Document::fromString('...');
 $document-&gt;merge(
    Document::fromString('...', new Id('...')),
@@ -215,9 +215,10 @@ $document-&gt;merge(
 <p>Of course, alternatively using a collection is still a valid option as well:</p>
 <pre><code class="language-php">$document = Document::fromString('...');
 
-$list = new DocumentCollection();
-$list-&gt;add(Document::fromString('...', new Id('...')));
-$list-&gt;add(Document::fromString('...', new Id('...')));
+$list = new DocumentCollection(
+    Document::fromString('...', new Id('...')),
+    Document::fromString('...', new Id('...'))
+);
 
 $document-&gt;merge($list);
 </code></pre>
@@ -228,7 +229,7 @@ $document-&gt;merge($list);
  &lt;p&gt;text here&lt;/p&gt;
 &lt;/templado:snippet&gt;
 </code></pre>
-<p>Templado 5.0 documents provide the same option, but use a different namespace as the id lookup mechanism is no longer supported. The root element name in Templado 5 defaults to "document" but is technically irrelevant as only the namespace is currently checked upon merge.</p>
+<p>Templado 5.0 documents provide the same option, but use a different namespace as the id lookup mechanism optionally used in Templado 4 is no longer supported. The root element name in Templado 5 defaults to "document" but is technically irrelevant as only the namespace is currently checked upon merge.</p>
 <pre><code class="language-xml">&lt;templado:document xmlns=&quot;http://www.w3.org/1999/xhtml&quot; xmlns:templado=&quot;https://templado.io/document/1.0&quot;&gt;
  &lt;h1&gt;Title&lt;/h1&gt;
  &lt;p&gt;text here&lt;/p&gt;
